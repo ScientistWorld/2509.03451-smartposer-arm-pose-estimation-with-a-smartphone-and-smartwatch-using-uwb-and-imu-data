@@ -3,17 +3,17 @@
     "pose_tracking_synthetic": {
       "results": {
         "imu_only": {
-          "median_elbow_cm": 17.15920066833496,
-          "median_wrist_cm": 22.136859893798828,
-          "median_elbow_wrist_cm": 19.757413864135742,
-          "mean_elbow_wrist_cm": 19.04633903503418,
+          "median_elbow_cm": 12.976408004760742,
+          "median_wrist_cm": 15.04150390625,
+          "median_elbow_wrist_cm": 14.175334930419922,
+          "mean_elbow_wrist_cm": 16.313621520996094,
           "param_count_k": 43.4
         },
         "smartposer": {
-          "median_elbow_cm": 15.333457946777344,
-          "median_wrist_cm": 21.199853897094727,
-          "median_elbow_wrist_cm": 16.514415740966797,
-          "mean_elbow_wrist_cm": 17.54086685180664,
+          "median_elbow_cm": 13.301057815551758,
+          "median_wrist_cm": 13.515533447265625,
+          "median_elbow_wrist_cm": 13.386923789978027,
+          "mean_elbow_wrist_cm": 15.14234447479248,
           "param_count_k": 46.4
         }
       }
@@ -21,9 +21,9 @@
     "uwb_correction_synthetic": {
       "results": {
         "smartposer": {
-          "raw_uwb_mae_cm": 3.3448946475982666,
-          "corrected_uwb_mae_cm": 11.244542121887207,
-          "uwb_improvement_cm": -7.8996477127075195
+          "raw_uwb_mae_cm": 14.09130859375,
+          "corrected_uwb_mae_cm": 7.41398286819458,
+          "uwb_improvement_cm": 6.67732572555542
         }
       }
     }
