@@ -15,7 +15,7 @@
 
 set -e
 
-cd /home/user
+cd "$(dirname "$0")/.."
 
 if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
   bash scripts/download.sh

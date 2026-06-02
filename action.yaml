@@ -2,4 +2,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Core claim supported: SmartPoser improves median elbow+wrist error over IMU-only on train/test and corrected UWB improves raw UWB on train/test; fold-level split, 22 train metrics, 22 test metrics; caveat: synthetic folds share the same simulator."
+notes: "Packaging audit complete: download.sh regenerates required synthetic data and scripts now use repo-relative paths."

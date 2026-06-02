@@ -4,7 +4,7 @@
 
 set -e
 
-cd /home/user
+cd "$(dirname "$0")/.."
 
-bash scripts/evaluate_train.sh /home/user/checkpoints
-bash scripts/evaluate_test.sh /home/user/checkpoints
+bash scripts/evaluate_train.sh checkpoints
+bash scripts/evaluate_test.sh checkpoints

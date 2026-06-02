@@ -8,7 +8,7 @@
 # Assumes:
 #   - Container is built (environment/container.sif)
 #   - Data and models are downloaded (via scripts/download.sh)
-#   - Working directory is /home/user
+#   - Working directory is the workspace root
 #
 # This is the "gold standard" reproduction — 
 # You do not need to run this, but keep this in good shape
@@ -16,7 +16,7 @@
 
 set -e
 
-cd /home/user
+cd "$(dirname "$0")/.."
 
 rm -rf data/smartposer_synthetic_fold_* checkpoints/imu_only* checkpoints/smartposer* scoring/scores.json
 

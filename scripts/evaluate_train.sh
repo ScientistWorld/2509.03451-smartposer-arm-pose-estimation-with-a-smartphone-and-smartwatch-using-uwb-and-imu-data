@@ -4,7 +4,7 @@
 
 set -e
 
-cd /home/user
+cd "$(dirname "$0")/.."
 
 mkdir -p scoring
 
