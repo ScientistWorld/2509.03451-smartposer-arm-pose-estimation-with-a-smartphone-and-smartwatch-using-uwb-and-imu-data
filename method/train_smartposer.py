@@ -37,6 +37,10 @@ def evaluate(model: SmartPoser, loader: DataLoader, device: torch.device) -> dic
     return {k: np.concatenate(v, axis=0) for k, v in outs.items()}
 
 
+def count_parameters(model: torch.nn.Module) -> int:
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", type=Path, default=Path("data/smartposer_synthetic"))
@@ -44,7 +48,7 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=45)
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)
-    ap.add_argument("--uwb-loss-weight", type=float, default=8.0)
+    ap.add_argument("--uwb-loss-weight", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=17)
     args = ap.parse_args()
 
@@ -73,7 +77,22 @@ def main() -> None:
         history.append({"epoch": epoch + 1, "loss": float(np.mean(losses))})
         print(json.dumps(history[-1]), flush=True)
 
-    torch.save({"model": model.state_dict(), "history": history}, args.out_dir / "smartposer.pt")
+    param_count = count_parameters(model)
+    torch.save({"model": model.state_dict(), "history": history, "param_count": param_count}, args.out_dir / "smartposer.pt")
+    (args.out_dir / "metadata.json").write_text(
+        json.dumps(
+            {
+                "method": "smartposer",
+                "param_count": param_count,
+                "param_count_k": param_count / 1000.0,
+                "uwb_loss_weight": args.uwb_loss_weight,
+                "epochs": args.epochs,
+                "data_dir": str(args.data_dir),
+            },
+            indent=2,
+        )
+        + "\n"
+    )
     preds = evaluate(model, test_loader, device)
     np.savez_compressed(args.out_dir / "predictions.npz", **preds)
 

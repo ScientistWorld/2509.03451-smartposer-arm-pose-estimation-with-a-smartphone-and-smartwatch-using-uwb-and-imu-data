@@ -1,8 +1,18 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: method_runs**
 
 ## Progress Log
+
+### [2026-06-02 11:22] - method_runs
+- Continuation audit found the prior `core_claim` too weak: it used a single synthetic held-out subject, an 8x UWB loss weight rather than the paper's unweighted summed loss, permissive evaluation on missing artifacts, and hard-coded parameter counts.
+- Fixed the protocol to run 10 leave-one-synthetic-subject-out folds, restored the paper-default loss weighting, wrote parameter-count metadata from trained models, and made evaluation require both SmartPoser and IMU-only outputs.
+- Downgraded to `method_runs` until the corrected benchmark job finishes and produces new scores.
+
+### [2026-06-02 11:15] - method_runs
+- Continuation audit reviewed `method/`, `baseline/`, `eval/`, scripts, scoring files, and briefing documents.
+- Confirmed the implementation is the paper-identifiable SmartPoser algorithm rather than a surrogate, and that evaluation reads saved artifacts without importing from `method/`.
+- Rechecked `https://github.com/FIGLAB/SmartPoser.git`; it still returns `Repository not found`, so the documented synthetic substitute remains necessary.
 
 ### [2026-06-02 11:03] - core_claim
 - Implemented and ran SmartPoser's two-stage UWB correction plus pose-estimation RNN on the synthetic held-out-subject benchmark.
@@ -10,4 +20,4 @@
 - `python validate.py --compare` passes with evaluation artifacts written to `scoring/scores.json`.
 
 ## Stop Justification
-- Completed at milestone `core_claim`; the original public repository is unavailable, so further progress toward paper-scale reproduction would require the released synchronized UWB/IMU/Kinect dataset becoming accessible.
+- Not stopped; a corrected 10-fold substitute benchmark has been prepared for submission.

@@ -23,6 +23,10 @@ def load_npz(path: Path) -> TensorDataset:
     )
 
 
+def count_parameters(model: torch.nn.Module) -> int:
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", type=Path, default=Path("data/smartposer_synthetic"))
@@ -37,6 +41,7 @@ def main() -> None:
     train_loader = DataLoader(load_npz(args.data_dir / "train_windows.npz"), batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(load_npz(args.data_dir / "test_windows.npz"), batch_size=args.batch_size)
     model = IMUOnlyPose().to(device)
+    param_count = count_parameters(model)
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     for epoch in range(args.epochs):
         model.train()
@@ -63,6 +68,19 @@ def main() -> None:
             outs["features"].append(features.numpy())
             outs["true_distance"].append(true_dist.numpy())
     np.savez_compressed(args.out_dir / "predictions.npz", **{k: np.concatenate(v, axis=0) for k, v in outs.items()})
+    (args.out_dir / "metadata.json").write_text(
+        json.dumps(
+            {
+                "method": "imu_only",
+                "param_count": param_count,
+                "param_count_k": param_count / 1000.0,
+                "epochs": args.epochs,
+                "data_dir": str(args.data_dir),
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
 
 if __name__ == "__main__":

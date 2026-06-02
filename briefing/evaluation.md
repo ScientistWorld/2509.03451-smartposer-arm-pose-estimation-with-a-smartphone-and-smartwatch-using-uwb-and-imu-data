@@ -12,4 +12,4 @@ The paper reports 11.0 cm median elbow+wrist error, with 8.7 cm elbow and 13.3 c
 
 ## Evaluation Protocol
 
-The original study uses leave-one-participant-out cross validation over 10 participants and reports results across daily activities plus gross motor arm motions. This environment uses a synthetic substitute split with the final subject held out, because the paper's cited repository is unavailable. Evaluation reads prediction artifacts from `checkpoints/*/predictions.npz` and writes `scoring/scores.json`; it does not import from `method/`.
+The original study uses leave-one-participant-out cross validation over 10 participants and reports results across daily activities plus gross motor arm motions. This environment uses a 10-fold leave-one-synthetic-subject-out substitute protocol because the paper's cited repository is unavailable. Evaluation reads prediction artifacts from `checkpoints/*/predictions.npz` and method metadata from `checkpoints/*/metadata.json`; it writes `scoring/scores.json` and does not import from `method/`.

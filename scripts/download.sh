@@ -23,3 +23,9 @@ cd "$(dirname "$0")/.."
 if [ ! -e data/smartposer_synthetic/train_windows.npz ] || [ ! -e data/smartposer_synthetic/test_windows.npz ]; then
   python data/synthetic_smartposer.py --out data/smartposer_synthetic --subjects 10 --frames 1000 --seed 7
 fi
+
+for fold in $(seq 0 9); do
+  if [ ! -e "data/smartposer_synthetic_fold_${fold}/train_windows.npz" ] || [ ! -e "data/smartposer_synthetic_fold_${fold}/test_windows.npz" ]; then
+    python data/synthetic_smartposer.py --out "data/smartposer_synthetic_fold_${fold}" --subjects 10 --frames 1000 --seed 7 --test-subject "${fold}"
+  fi
+done

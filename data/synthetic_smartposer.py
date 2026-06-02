@@ -141,13 +141,17 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
     }
 
 
-def build_dataset(out_dir: Path, subjects: int = 10, frames: int = 1000, seed: int = 7) -> None:
+def build_dataset(out_dir: Path, subjects: int = 10, frames: int = 1000, seed: int = 7, test_subject: int | None = None) -> None:
     rng = np.random.default_rng(seed)
     out_dir.mkdir(parents=True, exist_ok=True)
+    if test_subject is None:
+        test_subject = subjects - 1
+    if not 0 <= test_subject < subjects:
+        raise ValueError(f"test_subject must be in [0, {subjects}), got {test_subject}")
     train_parts, test_parts = [], []
     for sid in range(subjects):
         seq = _make_sequence(rng, frames, sid)
-        if sid == subjects - 1:
+        if sid == test_subject:
             test_parts.append(seq)
         else:
             train_parts.append(seq)
@@ -163,8 +167,9 @@ def main() -> None:
     ap.add_argument("--subjects", type=int, default=10)
     ap.add_argument("--frames", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--test-subject", type=int, default=None)
     args = ap.parse_args()
-    build_dataset(args.out, args.subjects, args.frames, args.seed)
+    build_dataset(args.out, args.subjects, args.frames, args.seed, args.test_subject)
 
 
 if __name__ == "__main__":
