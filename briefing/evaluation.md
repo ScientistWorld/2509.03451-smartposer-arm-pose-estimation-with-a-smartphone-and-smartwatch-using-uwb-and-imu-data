@@ -1,7 +1,5 @@
 # Evaluation
 
-How success is measured. Describe only the metrics, targets, and evaluation procedure — do NOT describe the paper's method or how they achieved these results. Think of this as a general evaluation protocal for other scientists trying to solve the same problem, where they should not see this paper's solution.
-
 ## Metrics
 
 The main metric is median positional error in centimeters for elbow and wrist joints, computed as Euclidean distance between predicted and ground-truth 3-D joint coordinates after scaling normalized coordinates by arm span. Lower is better. Supporting metrics include per-joint median error, mean elbow+wrist error, and mean absolute error for range correction.

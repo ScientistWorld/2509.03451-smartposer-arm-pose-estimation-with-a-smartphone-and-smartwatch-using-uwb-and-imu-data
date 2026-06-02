@@ -21,5 +21,10 @@
 - Reproduced the core SmartPoser effect on the packaged substitute benchmark: SmartPoser median elbow+wrist error was 13.66 cm versus 14.73 cm for IMU-only.
 - Reproduced the UWB correction constraint: corrected UWB MAE was 9.48 cm versus 14.02 cm raw UWB MAE.
 
+### [2026-06-02 12:56] - core_claim
+- Final verification passed `python validate.py --compare`.
+- Refreshed `scoring/scores.json` so it includes the same robustness and constraint metrics exposed by the evaluator.
+- Cleaned method-agnostic documentation and kept the milestone at `core_claim`.
+
 ## Current Limitation
 - Higher milestones require the original synchronized UWB/IMU/Kinect release or additional substitute benchmark settings beyond the current validated package.

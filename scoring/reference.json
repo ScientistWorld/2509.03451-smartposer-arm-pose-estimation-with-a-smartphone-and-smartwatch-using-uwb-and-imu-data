@@ -38,7 +38,7 @@
       "weight": 0.3,
       "primary_metric": "corrected_uwb_mae_cm",
       "metrics": {
-        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": -0.1, "description": "Mean raw range error before correction, reported as context for correction difficulty."},
+        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": 0.0, "description": "Mean raw range error before correction, reported only as context for correction difficulty."},
         "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": -1.0, "description": "Headline mean absolute error after range correction."},
         "corrected_uwb_p90_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Ninetieth-percentile corrected range error, detecting brittle correction on difficult samples."},
         "uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.55, "description": "Mean error reduction from raw to corrected range."},

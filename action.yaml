@@ -1,5 +1,5 @@
-action: submit
+action: done
 gpus: 0
-test: true
+test: false
 milestone: core_claim
-notes: "CPU validation job: recompute scores.json with richer evaluator metrics from existing artifacts, run train/test evaluators, and validate --compare."
+notes: "Final verification passed; workspace is ready for gym use at core_claim with synthetic substitute data."
