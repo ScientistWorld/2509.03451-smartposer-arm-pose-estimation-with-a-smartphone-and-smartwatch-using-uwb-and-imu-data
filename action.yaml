@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
-gpus: 0
+action: pending
+gpus: 1
 test: false
-milestone: core_claim
-notes: "Corrected 10-fold substitute benchmark completed and passed validation: SmartPoser improves over IMU-only pose error, corrects raw UWB error, uses paper-default summed loss, and reports real metadata parameter counts."
+milestone: method_runs
+notes: ""
