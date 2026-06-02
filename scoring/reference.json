@@ -1,7 +1,7 @@
 {
   "experiments": {
     "pose_tracking_synthetic": {
-      "description": "Arm pose tracking with leave-one-subject-out-style synthetic substitute data; paper reference values are from the combined gross motor plus daily activities study (Table 1 and Figure 10).",
+      "description": "Arm pose tracking with 10-fold leave-one-synthetic-subject-out substitute data; paper reference values are from the combined gross motor plus daily activities study (Table 1 and Figure 10).",
       "weight": 0.7,
       "primary_metric": "median_elbow_wrist_cm",
       "metrics": {

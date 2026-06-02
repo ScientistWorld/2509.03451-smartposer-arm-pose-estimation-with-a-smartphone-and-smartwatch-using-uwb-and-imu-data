@@ -1,8 +1,13 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
+
+### [2026-06-02 11:54] - core_claim
+- Job `1ee26c07-551` completed the corrected 10-fold leave-one-synthetic-subject-out benchmark with the paper-default summed loss.
+- SmartPoser improved median elbow+wrist error over IMU-only from 14.76 cm to 13.55 cm and reduced raw UWB MAE from 14.01 cm to 9.41 cm.
+- Validation passed, evaluation used saved artifacts, and parameter counts were read from method metadata instead of being hard-coded.
 
 ### [2026-06-02 11:22] - method_runs
 - Continuation audit found the prior `core_claim` too weak: it used a single synthetic held-out subject, an 8x UWB loss weight rather than the paper's unweighted summed loss, permissive evaluation on missing artifacts, and hard-coded parameter counts.
@@ -20,4 +25,4 @@
 - `python validate.py --compare` passes with evaluation artifacts written to `scoring/scores.json`.
 
 ## Stop Justification
-- Not stopped; a corrected 10-fold substitute benchmark has been prepared for submission.
+- Completed at `core_claim` on the corrected substitute-data benchmark. Higher milestones require the original synchronized UWB/IMU/Kinect data or additional independently meaningful settings; the paper's cited release repository remains unavailable.

@@ -10,6 +10,7 @@
 - Job `38e42a1e-b7e` reproduced the core claim on the first synthetic substitute benchmark: the full UWB+IMU method outperformed the IMU-only ablation and corrected structured UWB range error.
 - Continuation audit on 2026-06-02 found integrity gaps in that first `core_claim`: the synthetic protocol used only one held-out subject, the run used an 8x UWB loss weight instead of the paper's unweighted summed loss, parameter counts were hard-coded in evaluation, and evaluation did not fail on missing required artifacts.
 - Fixes are now implemented: fold-selectable synthetic data, 10-fold leave-one-synthetic-subject-out run scripts, paper-default `UWB MSE + MPJPE` training, metadata-recorded trainable parameter counts, and stricter evaluation artifact requirements. A new job is required before restoring `core_claim`.
+- Job `1ee26c07-551` ran the corrected 10-fold substitute benchmark successfully and passed `python validate.py --compare`. The corrected run restores `core_claim` on the packaged substitute benchmark.
 
 ## Results
 
@@ -24,11 +25,16 @@
   - SmartPoser median elbow+wrist error: 13.39 cm.
   - Raw UWB MAE: 14.09 cm.
   - Corrected UWB MAE: 7.41 cm.
+- Job `1ee26c07-551` corrected 10-fold substitute results with paper-default loss:
+  - IMU-only median elbow+wrist error: 14.76 cm.
+  - SmartPoser median elbow+wrist error: 13.55 cm.
+  - Raw UWB MAE: 14.01 cm.
+  - Corrected UWB MAE: 9.41 cm.
+  - Trainable parameters from metadata: IMU-only 40.777k, SmartPoser 44.698k.
 - Paper reference values: IMU-only median elbow+wrist error 14.2 cm, SmartPoser median elbow+wrist error 11.0 cm, raw UWB MAE 21.0 cm, corrected UWB MAE 8.6 cm.
 
 ## Remaining
 
-- Run the corrected 10-fold synthetic substitute benchmark and inspect whether SmartPoser still improves over IMU-only and corrects raw UWB error under the paper-default loss.
 - Higher milestones would require the original released synchronized UWB/IMU/Kinect dataset or additional substitute settings.
 - If the original repository becomes reachable, replace the synthetic substitute with the released data and rerun.
 
@@ -38,6 +44,7 @@
 - The first synthetic split made raw UWB too clean on the held-out subject, which let pose improve but did not test the paper's UWB correction claim. The generator now applies more common pose-dependent occlusion and multipath bias.
 - The login-node Python environment does not have `numpy`, so `scripts/evaluate.sh` is expected to run in the packaged container/overlay or scheduler job environment. The completed compute job `38e42a1e-b7e` verified that path.
 - The first continuation audit downgraded the claimed milestone until the corrected protocol is run.
+- The corrected benchmark restores the core effect but does not reach the paper's 11.0 cm real-data primary metric. It is a substitute-data core reproduction, not a full paper-scale reproduction.
 
 ## Deviations from Paper
 
