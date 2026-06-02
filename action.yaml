@@ -2,4 +2,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Run evaluate_{train,test}.sh against existing checkpoint prediction artifacts; populate scores_train.json and scores_test.json."
+notes: "Re-run evaluate_{train,test}.sh after switching train/test scoring to fold-level split with temporal fallback."

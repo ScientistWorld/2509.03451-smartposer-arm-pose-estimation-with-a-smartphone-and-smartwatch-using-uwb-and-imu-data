@@ -13,6 +13,7 @@ SLICE = "test"
 DEFAULT_OUT = Path("scoring/scores_test.json")
 DEFAULT_PATTERN = "checkpoints/*/predictions.npz"
 DEFAULT_TRAIN_SCORES = Path("scoring/scores_train.json")
+FOLD_PARITY = 1
 POSE_KEYS = {"pred_joints", "true_joints", "arm_span"}
 UWB_KEYS = {"features", "true_distance", "corrected_distance", "arm_span"}
 
@@ -67,6 +68,24 @@ def _group_by_method(paths: list[Path]) -> dict[str, list[Path]]:
     return {method: sorted(method_paths) for method, method_paths in sorted(grouped.items())}
 
 
+def _fold_index(path: Path) -> int | None:
+    match = re.search(r"[_-]fold[_-]?(\d+)$", path.parent.name)
+    if match:
+        return int(match.group(1))
+    return None
+
+
+def _select_slice_paths(paths: list[Path]) -> tuple[list[Path], bool]:
+    fold_paths = [(path, _fold_index(path)) for path in paths]
+    if any(fold is None for _, fold in fold_paths):
+        return paths, False
+
+    selected = [path for path, fold in fold_paths if fold % 2 == FOLD_PARITY]
+    if selected and len(selected) < len(paths):
+        return selected, True
+    return paths, False
+
+
 def _metadata_param_count_k(paths: list[Path]) -> float:
     counts = []
     for path in paths:
@@ -91,7 +110,7 @@ def _slice_mask(n: int, block_size: int) -> np.ndarray:
     return mask
 
 
-def _load_concat(paths: list[Path], required_keys: set[str], block_size: int) -> dict[str, np.ndarray]:
+def _load_concat(paths: list[Path], required_keys: set[str], block_size: int, use_full_artifact: bool) -> dict[str, np.ndarray]:
     if not paths:
         raise FileNotFoundError("No prediction artifacts were provided")
     arrays = {key: [] for key in sorted(required_keys)}
@@ -101,7 +120,10 @@ def _load_concat(paths: list[Path], required_keys: set[str], block_size: int) ->
             if missing:
                 raise KeyError(f"{path} is missing required keys for {SLICE} scoring: {sorted(missing)}")
             first_key = next(iter(required_keys))
-            mask = _slice_mask(int(data[first_key].shape[0]), block_size)
+            if use_full_artifact:
+                mask = np.ones(int(data[first_key].shape[0]), dtype=bool)
+            else:
+                mask = _slice_mask(int(data[first_key].shape[0]), block_size)
             for key in arrays:
                 arrays[key].append(data[key][mask])
     return {key: np.concatenate(chunks, axis=0) for key, chunks in arrays.items()}
@@ -151,8 +173,8 @@ def high_motion_mean_cm(d: dict[str, np.ndarray], both_errors: np.ndarray) -> fl
     return float(np.mean(sample_errors[mask]))
 
 
-def summarize_pose(paths: list[Path], block_size: int) -> dict[str, float]:
-    d = _load_concat(paths, POSE_KEYS, block_size)
+def summarize_pose(paths: list[Path], block_size: int, use_full_artifact: bool) -> dict[str, float]:
+    d = _load_concat(paths, POSE_KEYS, block_size, use_full_artifact)
     elbow, wrist, both = _elbow_wrist_errors_at_target(d)
     return {
         "median_elbow_cm": float(np.median(elbow)),
@@ -166,8 +188,8 @@ def summarize_pose(paths: list[Path], block_size: int) -> dict[str, float]:
     }
 
 
-def summarize_uwb(paths: list[Path], block_size: int) -> dict[str, float]:
-    d = _load_concat(paths, UWB_KEYS, block_size)
+def summarize_uwb(paths: list[Path], block_size: int, use_full_artifact: bool) -> dict[str, float]:
+    d = _load_concat(paths, UWB_KEYS, block_size, use_full_artifact)
     span = d["arm_span"][..., 0]
     true = d["true_distance"][..., 0]
     raw = d["features"][..., 0]
@@ -192,10 +214,11 @@ def build_scores(paths: list[Path], block_size: int) -> dict:
     pose_results = {}
     uwb_results = {}
     for method, method_paths in grouped.items():
-        if _all_paths_have_keys(method_paths, POSE_KEYS):
-            pose_results[method] = summarize_pose(method_paths, block_size)
-        if _all_paths_have_keys(method_paths, UWB_KEYS):
-            uwb_results[method] = summarize_uwb(method_paths, block_size)
+        slice_paths, use_full_artifact = _select_slice_paths(method_paths)
+        if _all_paths_have_keys(slice_paths, POSE_KEYS):
+            pose_results[method] = summarize_pose(slice_paths, block_size, use_full_artifact)
+        if _all_paths_have_keys(slice_paths, UWB_KEYS):
+            uwb_results[method] = summarize_uwb(slice_paths, block_size, use_full_artifact)
 
     if pose_results:
         scores["experiments"]["pose_tracking_synthetic"] = {"results": pose_results}
