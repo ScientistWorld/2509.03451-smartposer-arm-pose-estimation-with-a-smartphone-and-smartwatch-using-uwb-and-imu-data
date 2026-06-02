@@ -8,4 +8,8 @@ cd /home/user
 
 mkdir -p scoring
 
-python eval/test/evaluate.py "$@"
+if [ "$#" -eq 1 ] && [ -d "$1" ]; then
+  python eval/test/evaluate.py --predictions "$1/*/predictions.npz"
+else
+  python eval/test/evaluate.py "$@"
+fi

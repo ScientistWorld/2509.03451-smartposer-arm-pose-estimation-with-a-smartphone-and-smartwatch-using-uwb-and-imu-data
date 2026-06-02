@@ -1,9 +1,5 @@
-# This iteration writes files only — do NOT submit compute jobs.
-# Once you set action to 'done', STOP immediately.
-# Do NOT sleep, poll, or wait. The system reads this file
-# only after your turn ends.
-action: done
+action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Improvements: added tail, high-motion, geometric-plausibility, hard-UWB, win-rate, and slice-marker checks. Notes: rolling-window train/test slices still overlap; see DESIGN_NOTES.md."
+notes: "Run evaluate_{train,test}.sh against existing checkpoint prediction artifacts; populate scores_train.json and scores_test.json."
