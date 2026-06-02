@@ -1,4 +1,5 @@
 action: done
 gpus: 0
 test: false
-notes: "Fold-level even/odd split with temporal fallback; 22 train metrics, 22 test metrics; pose train/test gaps are calibrated and UWB remains corrected on both slices; caveat: synthetic folds share the same simulator."
+milestone: core_claim
+notes: "Core claim supported: SmartPoser improves median elbow+wrist error over IMU-only on train/test and corrected UWB improves raw UWB on train/test; fold-level split, 22 train metrics, 22 test metrics; caveat: synthetic folds share the same simulator."
