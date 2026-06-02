@@ -19,10 +19,6 @@ The paper targets mobile arm pose estimation without cameras, external beacons, 
 
 # Problem Definition
 
-What problem does this paper address? Write this so that someone with no knowledge of the paper can understand what needs to be solved and how success is measured.
-
-Do NOT describe the paper's method or solution here — only the problem itself. Think about if a future scientist agent try to solve this problem from scratch without knowing what approach the paper took. If you leak the solution, you compromise the benchmark.
-
 ## Research Question
 
 Estimate a user's 3-D arm pose from sensors available on common mobile devices, without cameras, external infrastructure, or per-user training data. The target output is shoulder, elbow, and wrist joint position over time in a body-centered coordinate frame.
@@ -56,8 +52,6 @@ Primary: phone/watch UWB plus IMU data can track wrist and elbow pose around 11 
 ---
 
 # Evaluation
-
-How success is measured. Describe only the metrics, targets, and evaluation procedure — do NOT describe the paper's method or how they achieved these results. Think of this as a general evaluation protocal for other scientists trying to solve the same problem, where they should not see this paper's solution.
 
 ## Metrics
 
@@ -265,6 +259,38 @@ The original study uses leave-one-participant-out cross validation over 10 parti
 - Job `45fc335a-49e` completed the corrected 10-fold leave-one-synthetic-subject-out benchmark with rolling test windows and passed `python validate.py --compare`.
 - Reproduced the core SmartPoser effect on the packaged substitute benchmark: SmartPoser median elbow+wrist error was 13.66 cm versus 14.73 cm for IMU-only.
 - Reproduced the UWB correction constraint: corrected UWB MAE was 9.48 cm versus 14.02 cm raw UWB MAE.
+
+</details>
+
+### Iteration 8: gpt-5.5 (verifier)
+- **Milestone**: `core_claim` | **Status**: done
+- **Working time**: 7m | **GPU**: 0.0h
+- **Jobs**: 6 total (6 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-02 11:44] - core_claim
+- Implemented SmartPoser's actual two-stage algorithm: UWB correction BiLSTM followed by pose-estimation BiLSTM trained with summed UWB MSE and MPJPE losses.
+- Packaged a method-agnostic synthetic substitute benchmark because the paper's cited repository is unavailable.
+- Completed a 10-fold leave-one-synthetic-subject-out scheduler run that passed `python validate.py --compare`.
+- Reproduced the central effect on the substitute benchmark: SmartPoser improved median elbow+wrist error over IMU-only and reduced structured raw UWB range error.
+
+### [2026-06-02 11:58] - method_runs
+- Continuation audit reset the milestone to `method_runs`.
+- Fixed a protocol mismatch in the substitute data: test windows now use a one-frame rolling stride, matching the paper's n-5 rolling-buffer evaluation.
+- Fixed synthetic sensor preprocessing to mimic paper inputs more closely: raw UWB is sampled at 5 Hz then upsampled to 25 Hz, and watch orientation/acceleration are expressed relative to the phone frame.
+- A new scheduler run is required before restoring `core_claim` with the corrected benchmark.
+
+### [2026-06-02 12:29] - core_claim
+- Job `45fc335a-49e` completed the corrected 10-fold leave-one-synthetic-subject-out benchmark with rolling test windows and passed `python validate.py --compare`.
+- Reproduced the core SmartPoser effect on the packaged substitute benchmark: SmartPoser median elbow+wrist error was 13.66 cm versus 14.73 cm for IMU-only.
+- Reproduced the UWB correction constraint: corrected UWB MAE was 9.48 cm versus 14.02 cm raw UWB MAE.
+
+### [2026-06-02 12:56] - core_claim
+- Final verification passed `python validate.py --compare`.
+- Refreshed `scoring/scores.json` so it includes the same robustness and constraint metrics exposed by the evaluator.
+- Cleaned method-agnostic documentation and kept the milestone at `core_claim`.
 
 </details>
 
