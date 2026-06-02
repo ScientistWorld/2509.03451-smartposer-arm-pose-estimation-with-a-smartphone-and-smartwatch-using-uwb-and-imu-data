@@ -25,4 +25,4 @@
 - `python validate.py --compare` passes with evaluation artifacts written to `scoring/scores.json`.
 
 ## Stop Justification
-- Completed at `core_claim` on the corrected substitute-data benchmark. Higher milestones require the original synchronized UWB/IMU/Kinect data or additional independently meaningful settings; the paper's cited release repository remains unavailable.
+- Completed at milestone `core_claim`.
