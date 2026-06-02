@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
 test: false
-milestone: method_runs
-notes: "Run the corrected SmartPoser substitute benchmark with rolling test windows, 5 Hz upsampled UWB, and phone-relative watch IMU preprocessing to regenerate scores."
+milestone: core_claim
+notes: "Corrected rolling-window SmartPoser substitute benchmark completed successfully. Core claim reproduced: SmartPoser improves pose error over IMU-only and corrected UWB improves over raw UWB on the packaged 10-fold synthetic benchmark."
