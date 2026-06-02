@@ -34,4 +34,4 @@
 - This supports the paper's central claim on the documented synthetic substitute benchmark: fusing UWB range with IMU streams improves arm pose estimation and corrects structured UWB error.
 
 ## Stop Justification
-- Completed at milestone `core_claim`. The original released repository/data URL is unavailable, so the packaged environment uses a documented synthetic substitute while preserving the paper's actual two-stage SmartPoser algorithm.
+- Completed at milestone `core_claim`.

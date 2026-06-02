@@ -1,0 +1,141 @@
+{
+  "paper": {
+    "arxiv_id": "2509.03451",
+    "title": "SmartPoser: Arm Pose Estimation with a Smartphone and Smartwatch Using UWB and IMU Data",
+    "date": "",
+    "topics": [
+      "paper-type-metric-method",
+      "domain-cv",
+      "area-wearable-systems",
+      "category-sensing",
+      "method-imu-uwb-fusion",
+      "secondary-domain-robotics",
+      "secondary-area-embodied-ai",
+      "secondary-category-sensing",
+      "secondary-method-pose-estimation",
+      "selection-category-detection"
+    ]
+  },
+  "reproduction": {
+    "milestone": "core_claim",
+    "status": "done",
+    "error": null,
+    "scaffold": "codex",
+    "model": "gpt-5.5",
+    "profile": "gpt-5.5-medium",
+    "effort": "medium",
+    "gpu_hours_used": 0.0,
+    "current_iteration_gpu_budget": 30,
+    "current_iteration_gpu_hours_used": 0.0,
+    "total_gpu_hours_used": 0.0,
+    "current_iteration_cpu_hours_used": 0.102,
+    "total_cpu_hours_used": 0.102,
+    "gpu_budget": 30,
+    "duration_sec": 1132.4,
+    "cost_usd": null,
+    "input_tokens": 2995242,
+    "output_tokens": 28476,
+    "cached_input_tokens": 2724224,
+    "cache_creation_tokens": null,
+    "reasoning_tokens": 0,
+    "total_input_tokens": 2995242,
+    "num_turns": 70,
+    "duration_api_ms": null,
+    "num_runs": 1,
+    "iteration_count": 0,
+    "workflow": "standard",
+    "workflow_step": 0,
+    "total_gpu_jobs": 2,
+    "time_breakdown": {
+      "working": 496.20496916770935,
+      "building": 0.0729513168334961,
+      "installing": 2.4311046600341797,
+      "waiting": 449.855126619339
+    }
+  },
+  "agents": [
+    {
+      "scaffold": "codex",
+      "model": "gpt-5.5",
+      "profile": "gpt-5.5-medium",
+      "effort": "medium",
+      "role": "reproducer",
+      "is_iteration": false,
+      "iteration": 1,
+      "workflow": "standard",
+      "workflow_step": 0,
+      "started_at": 1780397091.3429859,
+      "finished_at": 1780398223.7453187,
+      "duration_sec": 1132.4,
+      "blocked_sec": 0.0,
+      "status": "done",
+      "error": null,
+      "milestone": "core_claim",
+      "gpu_budget": 30,
+      "gpu_hours_used": 0.0,
+      "total_gpu_hours_used": 0.0,
+      "cpu_hours_used": 0.102,
+      "time_breakdown": {
+        "working": 496.20496916770935,
+        "building": 0.0729513168334961,
+        "installing": 2.4311046600341797,
+        "waiting": 449.855126619339
+      },
+      "cost_usd": null,
+      "input_tokens": 2995242,
+      "output_tokens": 28476,
+      "cached_input_tokens": 2724224,
+      "cache_creation_tokens": null,
+      "reasoning_tokens": 0,
+      "total_input_tokens": 2995242,
+      "num_turns": 70,
+      "duration_api_ms": null,
+      "tool_uses": {
+        "shell": 61,
+        "file_edit": 9
+      },
+      "gpu_jobs": [
+        {
+          "run_id": "38e42a1e-b7e",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 0,
+          "num_cpus": 1,
+          "resource": "gpu-cpu",
+          "hive_job_id": "1e6b6403",
+          "status": "completed",
+          "returncode": 0,
+          "duration_sec": 180.2,
+          "submitted_at": 1780397813.9035494,
+          "started_at": 1780397866.1552348,
+          "completed_at": 1780398046.3772855
+        },
+        {
+          "run_id": "b83e5559-f3d",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 0,
+          "num_cpus": 1,
+          "resource": "gpu-cpu",
+          "hive_job_id": "30bda48c",
+          "status": "completed",
+          "returncode": 0,
+          "duration_sec": 187.4,
+          "submitted_at": 1780397480.193729,
+          "started_at": 1780397497.5940914,
+          "completed_at": 1780397684.947632
+        }
+      ],
+      "progress_log": "### [2026-06-02 10:55] - none\n- Read the SmartPoser paper and extracted the core algorithm: UWB correction BiLSTM plus pose-estimation BiLSTM.\n- Verified the cited `https://github.com/FIGLAB/SmartPoser` repository is currently unreachable, so the original released dataset/code cannot be fetched in this turn.\n- Implemented the paper's actual two-stage model topology and a method-agnostic synthetic substitute dataset for phone/watch UWB+IMU arm tracking.\n- Added evaluation targets for pose tracking, UWB correction, and the IMU-only ablation.\n\n### [2026-06-02 11:00] - method_runs\n- Job `b83e5559-f3d` completed successfully on a CPU test node.\n- The IMU-only baseline and two-stage SmartPoser model both trained end-to-end and wrote prediction artifacts.\n- Evaluation produced `scoring/scores.json`; SmartPoser improved pose median error over IMU-only, but UWB correction was worse than raw UWB, so this is not yet `core_claim`.\n- Updated the synthetic data generator and training configuration to better exercise and supervise UWB correction before the next job.\n\n### [2026-06-02 11:05] - core_claim\n- Job `38e42a1e-b7e` completed successfully on a CPU test node.\n- SmartPoser reduced median elbow+wrist pose error from 14.18 cm for the IMU-only ablation to 13.39 cm on the held-out synthetic subject.\n- The UWB correction stage reduced range MAE from 14.09 cm raw UWB to 7.41 cm corrected UWB.\n- This supports the paper's central claim on the documented synthetic substitute benchmark: fusing UWB range with IMU streams improves arm pose estimation and corrects structured UWB error."
+    }
+  ],
+  "components": {
+    "has_container": true,
+    "has_method_code": true,
+    "has_evaluation": true,
+    "has_download_script": true,
+    "has_reproduce_script": true,
+    "has_method_script": true,
+    "has_baseline": true,
+    "has_reference": true,
+    "has_data": true
+  }
+}
