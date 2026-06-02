@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
 
@@ -15,6 +15,11 @@
 - Fixed a protocol mismatch in the substitute data: test windows now use a one-frame rolling stride, matching the paper's n-5 rolling-buffer evaluation.
 - Fixed synthetic sensor preprocessing to mimic paper inputs more closely: raw UWB is sampled at 5 Hz then upsampled to 25 Hz, and watch orientation/acceleration are expressed relative to the phone frame.
 - A new scheduler run is required before restoring `core_claim` with the corrected benchmark.
+
+### [2026-06-02 12:29] - core_claim
+- Job `45fc335a-49e` completed the corrected 10-fold leave-one-synthetic-subject-out benchmark with rolling test windows and passed `python validate.py --compare`.
+- Reproduced the core SmartPoser effect on the packaged substitute benchmark: SmartPoser median elbow+wrist error was 13.66 cm versus 14.73 cm for IMU-only.
+- Reproduced the UWB correction constraint: corrected UWB MAE was 9.48 cm versus 14.02 cm raw UWB MAE.
 
 ## Current Limitation
 - Higher milestones require the original synchronized UWB/IMU/Kinect release or additional substitute benchmark settings beyond the current validated package.
