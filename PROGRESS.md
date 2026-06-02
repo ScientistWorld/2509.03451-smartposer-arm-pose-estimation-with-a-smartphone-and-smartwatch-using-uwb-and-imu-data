@@ -11,6 +11,7 @@
 - Continuation audit on 2026-06-02 found integrity gaps in that first `core_claim`: the synthetic protocol used only one held-out subject, the run used an 8x UWB loss weight instead of the paper's unweighted summed loss, parameter counts were hard-coded in evaluation, and evaluation did not fail on missing required artifacts.
 - Fixes are now implemented: fold-selectable synthetic data, 10-fold leave-one-synthetic-subject-out run scripts, paper-default `UWB MSE + MPJPE` training, metadata-recorded trainable parameter counts, and stricter evaluation artifact requirements. A new job is required before restoring `core_claim`.
 - Job `1ee26c07-551` ran the corrected 10-fold substitute benchmark successfully and passed `python validate.py --compare`. The corrected run restores `core_claim` on the packaged substitute benchmark.
+- The IMU-only baseline has been decoupled from `method/` so baseline training no longer imports the proposed method module. A follow-up CPU test job is being submitted to revalidate the end-to-end path after this packaging fix.
 
 ## Results
 

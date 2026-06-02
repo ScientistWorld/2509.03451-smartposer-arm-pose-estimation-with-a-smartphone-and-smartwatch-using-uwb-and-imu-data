@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "method"))
-from smartposer_model import IMUOnlyPose, mpjpe  # noqa: E402
 
 
 def load_npz(path: Path) -> TensorDataset:
@@ -21,6 +17,38 @@ def load_npz(path: Path) -> TensorDataset:
         torch.from_numpy(data["joints"]),
         torch.from_numpy(data["arm_span"]),
     )
+
+
+class PoseEstimator(torch.nn.Module):
+    """IMU-only ablation network matching the paper's pose-estimator capacity."""
+
+    def __init__(self, input_dim: int = 25) -> None:
+        super().__init__()
+        self.rnn = torch.nn.LSTM(input_dim, 32, num_layers=2, batch_first=True, bidirectional=True)
+        self.out = torch.nn.Linear(64, 9)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        y, _ = self.rnn(x)
+        return self.out(y)
+
+
+class IMUOnlyPose(torch.nn.Module):
+    """Ablation baseline: same temporal pose estimator with the range channel removed."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.pose = PoseEstimator()
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        x = features.clone()
+        x[..., :1] = 0.0
+        return self.pose(x)
+
+
+def mpjpe(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    pred_j = pred.reshape(*pred.shape[:-1], 3, 3)
+    target_j = target.reshape(*target.shape[:-1], 3, 3)
+    return torch.linalg.norm(pred_j - target_j, dim=-1).mean()
 
 
 def count_parameters(model: torch.nn.Module) -> int:
