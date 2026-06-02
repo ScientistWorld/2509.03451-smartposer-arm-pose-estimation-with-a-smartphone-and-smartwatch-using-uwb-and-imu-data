@@ -22,5 +22,5 @@ if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
   bash scripts/download.sh
 fi
 
-bash scripts/baseline.sh --epochs "${EPOCHS:-45}"
-bash scripts/method.sh --epochs "${EPOCHS:-45}"
+bash scripts/baseline.sh --epochs "${BASELINE_EPOCHS:-45}"
+bash scripts/method.sh --epochs "${METHOD_EPOCHS:-60}" --uwb-loss-weight "${UWB_LOSS_WEIGHT:-8.0}"

@@ -44,6 +44,7 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=45)
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)
+    ap.add_argument("--uwb-loss-weight", type=float, default=8.0)
     ap.add_argument("--seed", type=int, default=17)
     args = ap.parse_args()
 
@@ -63,7 +64,7 @@ def main() -> None:
         for features, true_dist, joints, _arm_span in train_loader:
             features, true_dist, joints = features.to(device), true_dist.to(device), joints.to(device)
             corrected, pred = model(features)
-            loss = torch.mean((corrected - true_dist) ** 2) + mpjpe(pred, joints)
+            loss = args.uwb_loss_weight * torch.mean((corrected - true_dist) ** 2) + mpjpe(pred, joints)
             opt.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

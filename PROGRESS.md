@@ -6,20 +6,27 @@
 - `method/` contains a faithful two-stage SmartPoser implementation: UWB correction BiLSTM followed by pose-estimation BiLSTM, trained with the summed UWB MSE and MPJPE losses.
 - `data/` contains a method-agnostic synthetic substitute generator because the cited public repository is currently unavailable.
 - `eval/` reads prediction artifacts and writes `scoring/scores.json` without importing from `method/`.
+- Job `b83e5559-f3d` verified that baseline training, SmartPoser training, artifact writing, evaluation, and validation run end-to-end in the compute container.
 
 ## Results
 
-- No compute-node result yet. A test job is prepared to train the baseline and SmartPoser on the synthetic substitute split and compare scores against `scoring/reference.json`.
+- Job `b83e5559-f3d` results on the first synthetic split:
+  - IMU-only median elbow+wrist error: 19.76 cm.
+  - SmartPoser median elbow+wrist error: 16.51 cm.
+  - Raw UWB MAE: 3.34 cm.
+  - Corrected UWB MAE: 11.24 cm.
+- This reaches `method_runs` because the paper's actual two-stage algorithm executes end-to-end and improves pose over the ablation, but it does not reach `core_claim` because UWB correction failed.
 
 ## Remaining
 
-- Submit the prepared compute job.
-- Inspect `scoring/scores.json` after the job and iterate on training length/hyperparameters if the core claim is not supported.
+- Submit the updated compute job with harder structured UWB errors, longer training, and stronger UWB supervision.
+- Inspect `scoring/scores.json` after the job and iterate further if UWB correction or pose improvement still fails.
 - If the original repository becomes reachable, replace the synthetic substitute with the released data and rerun.
 
 ## Issues
 
 - The paper's cited GitHub repository returned "Repository not found" via `git ls-remote`.
+- The first synthetic split made raw UWB too clean on the held-out subject, which let pose improve but did not test the paper's UWB correction claim. The generator now applies more common pose-dependent occlusion and multipath bias.
 
 ## Deviations from Paper
 

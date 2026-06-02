@@ -96,9 +96,21 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
     phone_pos = np.array([-0.10, -0.48, -0.17], dtype=np.float32) * (arm_span / 1.70)
     true_dist = np.linalg.norm(wrist - phone_pos[None, :], axis=1) / arm_span
 
-    body_occ = ((wrist[:, 0] < -0.05) & (wrist[:, 2] < 0.03)) | ((wrist[:, 1] > 0.12) & (wrist[:, 0] < 0.10))
-    structured = body_occ.astype(np.float32) * rng.uniform(0.10, 0.28)
-    raw_dist = true_dist + structured + rng.normal(0, 0.025, size=frames).astype(np.float32)
+    # Structured UWB range error: body occlusion and multipath produce a
+    # pose-dependent positive bias, not just white noise. This is the phenomenon
+    # SmartPoser's first RNN is meant to correct.
+    behind_torso = wrist[:, 0] < 0.05
+    near_head = (wrist[:, 1] > 0.08) & (wrist[:, 2] < 0.20)
+    across_body = (wrist[:, 0] < 0.22) & (wrist[:, 1] > -0.05)
+    body_occ = behind_torso | near_head | across_body
+    occ_strength = (
+        0.07
+        + 0.11 / (1.0 + np.exp(18.0 * (wrist[:, 0] - 0.12)))
+        + 0.05 * np.maximum(wrist[:, 1] + 0.05, 0.0)
+    ).astype(np.float32)
+    burst = 0.025 * (np.sin(np.linspace(0, rng.uniform(4, 8) * np.pi, frames) + rng.uniform(0, np.pi)) + 1.0)
+    structured = body_occ.astype(np.float32) * (occ_strength + burst.astype(np.float32))
+    raw_dist = true_dist + structured + rng.normal(0, 0.035, size=frames).astype(np.float32)
     raw_dist = np.maximum(raw_dist, 0.03)
 
     phone_yaw = np.full(frames, rng.normal(0.0, 0.08), dtype=np.float32)

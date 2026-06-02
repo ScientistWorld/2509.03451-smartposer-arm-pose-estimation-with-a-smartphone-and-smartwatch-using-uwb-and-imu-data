@@ -13,7 +13,8 @@ set -e
 
 cd /home/user
 
+rm -rf data/smartposer_synthetic checkpoints/imu_only checkpoints/smartposer scoring/scores.json
 bash scripts/download.sh
-bash scripts/baseline.sh --epochs 20
-bash scripts/method.sh --epochs 20
+bash scripts/baseline.sh --epochs 45
+bash scripts/method.sh --epochs 60 --uwb-loss-weight 8.0
 python validate.py --compare
