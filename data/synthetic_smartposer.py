@@ -66,7 +66,9 @@ def _smooth_angles(rng: np.random.Generator, n: int, low: float, high: float) ->
 
 def _windowize(arrays: dict[str, np.ndarray], split: str) -> dict[str, np.ndarray]:
     xs = {k: [] for k in arrays}
-    step = WINDOW if split == "train" else 25
+    # Paper trains on non-overlapping 5 s windows, but at test time uses a
+    # rolling buffer with one new frame per prediction.
+    step = WINDOW if split == "train" else 1
     for start in range(0, arrays["features"].shape[0] - WINDOW + 1, step):
         for key, val in arrays.items():
             xs[key].append(val[start : start + WINDOW])
@@ -110,8 +112,13 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
     ).astype(np.float32)
     burst = 0.025 * (np.sin(np.linspace(0, rng.uniform(4, 8) * np.pi, frames) + rng.uniform(0, np.pi)) + 1.0)
     structured = body_occ.astype(np.float32) * (occ_strength + burst.astype(np.float32))
-    raw_dist = true_dist + structured + rng.normal(0, 0.035, size=frames).astype(np.float32)
-    raw_dist = np.maximum(raw_dist, 0.03)
+    raw_dist_continuous = true_dist + structured + rng.normal(0, 0.035, size=frames).astype(np.float32)
+    raw_dist_continuous = np.maximum(raw_dist_continuous, 0.03)
+    # UWB arrives at roughly 5 Hz in the paper and is upsampled to the 25 Hz
+    # IMU stream by repeating the latest range measurement.
+    uwb_stride = FPS // 5
+    sample_idx = (np.arange(frames) // uwb_stride) * uwb_stride
+    raw_dist = raw_dist_continuous[sample_idx]
 
     phone_yaw = np.full(frames, rng.normal(0.0, 0.08), dtype=np.float32)
     phone_rot = _rot_z(phone_yaw)
@@ -120,15 +127,18 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
     watch_vel = np.gradient(wrist, 1 / FPS, axis=0)
     watch_acc = np.gradient(watch_vel, 1 / FPS, axis=0) / 30.0
     phone_acc = rng.normal(0, 0.01, size=(frames, 3)).astype(np.float32)
+    phone_rot_t = np.swapaxes(phone_rot, -1, -2)
+    watch_rot_rel = _matmul(phone_rot_t, watch_rot)
+    watch_acc_rel = np.einsum("...ij,...j->...i", phone_rot_t, watch_acc).astype(np.float32)
 
     # Evaluation remains method-agnostic; methods receive only sensor features.
     features = np.concatenate(
         [
             raw_dist[:, None],
             phone_rot.reshape(frames, 9),
-            watch_rot.reshape(frames, 9),
+            watch_rot_rel.reshape(frames, 9),
             phone_acc,
-            watch_acc.astype(np.float32),
+            watch_acc_rel,
         ],
         axis=1,
     ).astype(np.float32)

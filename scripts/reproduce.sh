@@ -27,8 +27,8 @@ SEED="${SEED:-7}"
 for fold in $(seq 0 $((SUBJECTS - 1))); do
   data_dir="data/smartposer_synthetic_fold_${fold}"
   python data/synthetic_smartposer.py --out "${data_dir}" --subjects "${SUBJECTS}" --frames "${FRAMES}" --seed "${SEED}" --test-subject "${fold}"
-  bash scripts/baseline.sh --data-dir "${data_dir}" --out-dir "checkpoints/imu_only_fold_${fold}" --epochs "${BASELINE_EPOCHS:-45}"
-  bash scripts/method.sh --data-dir "${data_dir}" --out-dir "checkpoints/smartposer_fold_${fold}" --epochs "${METHOD_EPOCHS:-60}" --uwb-loss-weight "${UWB_LOSS_WEIGHT:-1.0}"
+  SKIP_EVAL=1 bash scripts/baseline.sh --data-dir "${data_dir}" --out-dir "checkpoints/imu_only_fold_${fold}" --epochs "${BASELINE_EPOCHS:-45}"
+  SKIP_EVAL=1 bash scripts/method.sh --data-dir "${data_dir}" --out-dir "checkpoints/smartposer_fold_${fold}" --epochs "${METHOD_EPOCHS:-60}" --uwb-loss-weight "${UWB_LOSS_WEIGHT:-1.0}"
 done
 
 bash scripts/evaluate.sh

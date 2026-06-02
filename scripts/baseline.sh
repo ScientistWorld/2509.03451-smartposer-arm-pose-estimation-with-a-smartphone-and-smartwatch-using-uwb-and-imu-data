@@ -22,4 +22,6 @@ if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
 fi
 
 python baseline/train_imu_only.py "$@"
-bash scripts/evaluate.sh --allow-partial
+if [ "${SKIP_EVAL:-0}" != "1" ]; then
+  bash scripts/evaluate.sh --allow-partial
+fi

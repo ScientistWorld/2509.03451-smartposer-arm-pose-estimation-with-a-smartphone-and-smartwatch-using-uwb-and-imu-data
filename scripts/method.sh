@@ -15,4 +15,6 @@ if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
 fi
 
 python method/train_smartposer.py "$@"
-bash scripts/evaluate.sh
+if [ "${SKIP_EVAL:-0}" != "1" ]; then
+  bash scripts/evaluate.sh
+fi

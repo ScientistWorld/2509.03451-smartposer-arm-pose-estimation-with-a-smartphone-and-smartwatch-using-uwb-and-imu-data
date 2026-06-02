@@ -12,6 +12,7 @@
 - Fixes are now implemented: fold-selectable synthetic data, 10-fold leave-one-synthetic-subject-out run scripts, paper-default `UWB MSE + MPJPE` training, metadata-recorded trainable parameter counts, and stricter evaluation artifact requirements. A new job is required before restoring `core_claim`.
 - Job `1ee26c07-551` ran the corrected 10-fold substitute benchmark successfully and passed `python validate.py --compare`. The corrected run restores `core_claim` on the packaged substitute benchmark.
 - The IMU-only baseline has been decoupled from `method/` so baseline training no longer imports the proposed method module. A follow-up CPU test job is being submitted to revalidate the end-to-end path after this packaging fix.
+- Current continuation audit found one remaining protocol mismatch: substitute test windows used stride 25 instead of the paper's rolling one-frame stride, and synthetic watch IMU features were not phone-relative. The generator now uses rolling test windows, 5 Hz raw UWB repeated to 25 Hz, and phone-relative watch orientation/acceleration. Existing `scoring/scores.json` is now stale until the next scheduler job completes.
 
 ## Results
 
@@ -46,6 +47,7 @@
 - The login-node Python environment does not have `numpy`, so `scripts/evaluate.sh` is expected to run in the packaged container/overlay or scheduler job environment. The completed compute job `38e42a1e-b7e` verified that path.
 - The first continuation audit downgraded the claimed milestone until the corrected protocol is run.
 - The corrected benchmark restores the core effect but does not reach the paper's 11.0 cm real-data primary metric. It is a substitute-data core reproduction, not a full paper-scale reproduction.
+- The current code has a pending benchmark rerun after correcting rolling-window and relative-frame preprocessing. Do not treat the old scores as final for this exact revision.
 
 ## Deviations from Paper
 
