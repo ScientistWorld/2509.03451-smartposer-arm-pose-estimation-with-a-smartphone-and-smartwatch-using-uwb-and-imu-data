@@ -1,5 +1,4 @@
-action: submit
+action: done
 gpus: 0
 test: false
-milestone: core_claim
-notes: "Re-run evaluate_{train,test}.sh after switching train/test scoring to fold-level split with temporal fallback."
+notes: "Fold-level even/odd split with temporal fallback; 22 train metrics, 22 test metrics; pose train/test gaps are calibrated and UWB remains corrected on both slices; caveat: synthetic folds share the same simulator."

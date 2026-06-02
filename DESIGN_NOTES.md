@@ -21,6 +21,7 @@
   - `uwb_correction_win_rate` checks that correction improves many samples, not only a few large outliers.
 - Updated `scoring/reference.json` with the new metrics, coefficients, and descriptions; removed wording that could imply matching published values is the scoring objective.
 - After the first completed split run (`77089693-424`), train/test values were valid but very close because the original design alternated overlapping temporal windows. The split now uses even-numbered fold artifacts for train and odd-numbered fold artifacts for test whenever fold IDs are available, falling back to temporal blocks only for single-artifact or non-fold submissions.
+- Final split run `3032c039-799` completed on CPU and populated 22 train metric values and 22 test metric values. Method sets match exactly across slices; `smartposer` remains better than `imu_only` on pose error while carrying the parameter-count constraint, and UWB correction improves raw range error on both slices.
 
 ## Runtime Concerns For Next Iteration
 
