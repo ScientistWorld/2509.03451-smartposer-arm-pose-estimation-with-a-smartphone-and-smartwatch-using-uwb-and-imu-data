@@ -15,7 +15,7 @@
 - The IMU-only baseline has been decoupled from `method/` so baseline training no longer imports the proposed method module.
 - Job `45fc335a-49e` ran the corrected 10-fold substitute benchmark after the continuation audit fixes: rolling one-frame test windows, 5 Hz raw UWB repeated to 25 Hz, and phone-relative watch orientation/acceleration. The job passed `python validate.py --compare` and restores `core_claim` for the current revision.
 - On 2026-06-02 12:52, the default evaluator was hardened to emit the robustness/constraint metrics already used by the train/test evaluators: p90 pose error, high-motion pose error, forearm-length error, corrected UWB p90, hard-UWB improvement, and UWB correction win rate.
-- On 2026-06-02 13:02, `scripts/run.sh` was fixed to regenerate synthetic data and prediction artifacts from source instead of relying on gitignored checkpoints. The same patch adds a gross-motor synthetic setting for a possible `core_claim_plus` result after scheduler validation.
+- On 2026-06-02 13:02, `scripts/run.sh` was fixed to regenerate synthetic data and prediction artifacts from source instead of relying on gitignored checkpoints. Final verification removed an unvalidated gross-motor extension from active scoring docs/reference so the packaged gym advertises only validated `core_claim` results.
 
 ## Results
 
@@ -43,11 +43,10 @@
   - Corrected UWB MAE: 9.48 cm.
   - Trainable parameters from metadata: IMU-only 40.777k, SmartPoser 44.698k.
 - Paper reference values: IMU-only median elbow+wrist error 14.2 cm, SmartPoser median elbow+wrist error 11.0 cm, raw UWB MAE 21.0 cm, corrected UWB MAE 8.6 cm.
-- Gross-motor extension results are pending the next scheduler job; no `core_claim_plus` result has been claimed yet.
 
 ## Remaining
 
-- Higher milestones would require the original released synchronized UWB/IMU/Kinect dataset or additional substitute settings.
+- Higher milestones would require the original released synchronized UWB/IMU/Kinect dataset or additional substitute settings that are separately run and validated.
 - If the original repository becomes reachable, replace the synthetic substitute with the released data and rerun.
 
 ## Issues

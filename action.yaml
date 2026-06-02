@@ -1,5 +1,3 @@
-action: submit
-gpus: 1
-test: false
+action: done
 milestone: core_claim
-notes: "Regenerate SmartPoser artifacts from source and evaluate the existing combined setting plus a gross-motor synthetic extension. Keep milestone at core_claim until the new setting validates."
+notes: "Final verification passed; active gym scores cover the validated synthetic core claim with clean method/eval separation."

@@ -28,8 +28,8 @@
 
 ### [2026-06-02 13:02] - core_claim
 - Fixed `scripts/run.sh` to regenerate data and prediction artifacts from source before evaluation, avoiding reliance on gitignored checkpoints.
-- Added a gross-motor synthetic benchmark setting aligned with the paper's second study phase.
-- `core_claim_plus` is not claimed yet; it requires the pending scheduler job to finish and produce validating scores.
+- Final verification removed an unvalidated gross-motor extension from the active scoring docs and reference file so the gym only advertises validated results.
+- No scheduler job is pending from final verification; the milestone remains `core_claim`.
 
 ## Current Limitation
 - Higher milestones require the original synchronized UWB/IMU/Kinect release or additional substitute benchmark settings beyond the current validated package.
