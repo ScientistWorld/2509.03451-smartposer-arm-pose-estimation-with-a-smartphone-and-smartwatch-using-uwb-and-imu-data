@@ -17,4 +17,9 @@ set -e
 
 cd /home/user
 
-# TODO: run baseline
+if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
+  bash scripts/download.sh
+fi
+
+python baseline/train_imu_only.py "$@"
+bash scripts/evaluate.sh

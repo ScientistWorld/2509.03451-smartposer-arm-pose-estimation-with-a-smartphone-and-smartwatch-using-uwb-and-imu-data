@@ -6,12 +6,12 @@ Do NOT describe the paper's method or solution here — only the problem itself.
 
 ## Research Question
 
-<!-- What problem or challenge does this paper tackle? What gap in existing work does it address? -->
+Estimate a user's 3-D arm pose from sensors available on common mobile devices, without cameras, external infrastructure, or per-user training data. The target output is shoulder, elbow, and wrist joint position over time in a body-centered coordinate frame.
 
 ## Why It Matters
 
-<!-- Why is this problem important? What would a good solution enable? Make it short -->
+Accurate mobile arm tracking would support fitness, rehabilitation, life logging, occupational training, games, and context-aware interfaces while avoiding privacy and deployment drawbacks of camera-based or instrumented motion-capture systems.
 
 ## Success Criteria
 
-<!-- What would a successful solution look like? What properties should it have? This is about the goal, not the paper's specific approach. Make it short -->
+A successful system predicts wrist and elbow positions with low centimeter-scale error on held-out users, remains stable across natural activities and large arm motions, and does not require user-specific training examples.

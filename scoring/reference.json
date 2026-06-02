@@ -1,0 +1,52 @@
+{
+  "experiments": {
+    "pose_tracking_synthetic": {
+      "description": "Arm pose tracking with leave-one-subject-out-style synthetic substitute data; paper reference values are from the combined gross motor plus daily activities study (Table 1 and Figure 10).",
+      "weight": 0.7,
+      "primary_metric": "median_elbow_wrist_cm",
+      "metrics": {
+        "median_elbow_cm": {"higher_is_better": false, "coefficient": -0.6},
+        "median_wrist_cm": {"higher_is_better": false, "coefficient": -0.6},
+        "median_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -1.0},
+        "mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.4},
+        "param_count_k": {"higher_is_better": false, "coefficient": -0.2}
+      },
+      "results": {
+        "imu_only": {
+          "type": "baseline",
+          "median_elbow_cm": 11.7,
+          "median_wrist_cm": 16.7,
+          "median_elbow_wrist_cm": 14.2,
+          "mean_elbow_wrist_cm": 18.7,
+          "param_count_k": 43.4
+        },
+        "smartposer": {
+          "type": "proposed",
+          "median_elbow_cm": 8.7,
+          "median_wrist_cm": 13.3,
+          "median_elbow_wrist_cm": 11.0,
+          "mean_elbow_wrist_cm": 12.6,
+          "param_count_k": 46.4
+        }
+      }
+    },
+    "uwb_correction_synthetic": {
+      "description": "UWB correction quality; paper reference values are from the raw-vs-corrected UWB distance analysis (Figure 7).",
+      "weight": 0.3,
+      "primary_metric": "corrected_uwb_mae_cm",
+      "metrics": {
+        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": -0.2},
+        "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": -1.0},
+        "uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.6}
+      },
+      "results": {
+        "smartposer": {
+          "type": "proposed",
+          "raw_uwb_mae_cm": 21.0,
+          "corrected_uwb_mae_cm": 8.6,
+          "uwb_improvement_cm": 12.4
+        }
+      }
+    }
+  }
+}

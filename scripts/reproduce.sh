@@ -18,7 +18,9 @@ set -e
 
 cd /home/user
 
-# TODO: implement full reproduction pipeline
-# e.g.:
-#   bash scripts/baseline.sh
-#   bash scripts/method.sh
+if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
+  bash scripts/download.sh
+fi
+
+bash scripts/baseline.sh --epochs "${EPOCHS:-45}"
+bash scripts/method.sh --epochs "${EPOCHS:-45}"

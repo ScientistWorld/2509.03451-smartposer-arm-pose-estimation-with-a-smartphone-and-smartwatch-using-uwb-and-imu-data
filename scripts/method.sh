@@ -10,5 +10,9 @@ set -e
 
 cd /home/user
 
-# TODO: run the paper's method
-# TODO: call scripts/evaluate.sh to score
+if [ ! -e data/smartposer_synthetic/train_windows.npz ]; then
+  bash scripts/download.sh
+fi
+
+python method/train_smartposer.py "$@"
+bash scripts/evaluate.sh

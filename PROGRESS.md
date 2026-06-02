@@ -2,19 +2,24 @@
 
 ## What Works
 
-<!-- What has been successfully reproduced so far. -->
+- Paper analysis is complete for the core SmartPoser claims and reported metrics.
+- `method/` contains a faithful two-stage SmartPoser implementation: UWB correction BiLSTM followed by pose-estimation BiLSTM, trained with the summed UWB MSE and MPJPE losses.
+- `data/` contains a method-agnostic synthetic substitute generator because the cited public repository is currently unavailable.
+- `eval/` reads prediction artifacts and writes `scoring/scores.json` without importing from `method/`.
 
 ## Results
 
-<!-- Reproduced numbers compared to the paper's reported numbers. -->
+- No compute-node result yet. A test job is prepared to train the baseline and SmartPoser on the synthetic substitute split and compare scores against `scoring/reference.json`.
 
 ## Remaining
 
-<!-- What still needs to be done to reach higher milestones. -->
+- Submit the prepared compute job.
+- Inspect `scoring/scores.json` after the job and iterate on training length/hyperparameters if the core claim is not supported.
+- If the original repository becomes reachable, replace the synthetic substitute with the released data and rerun.
 
 ## Issues
 
-<!-- Blockers, bugs, or difficulties encountered. -->
+- The paper's cited GitHub repository returned "Repository not found" via `git ls-remote`.
 
 ## Deviations from Paper
 
@@ -32,6 +37,5 @@
        - Wrote a generic model trained to approximate the method's outputs
          instead of implementing the method's computational steps
 
-     The test: could someone reading your code identify which algorithm from
-     the paper you implemented? If not, you replaced the method. -->
-
+- Data/resource substitution: the original synchronized UWB/IMU/Kinect dataset was cited at `https://github.com/FIGLAB/SmartPoser`, but that repository was unreachable on 2026-06-02 (`Repository not found`). I substituted a tracked synthetic generator that preserves the same feature/target structure: raw UWB range with structured occlusion error, phone/watch orientation matrices, accelerations, arm-span-normalized 3-D joints, and held-out-subject evaluation.
+- Scale substitution: the prepared job uses fewer epochs than a full reproduction for the first smoke run. The training objective, model topology, window length, and evaluation procedure remain the same.

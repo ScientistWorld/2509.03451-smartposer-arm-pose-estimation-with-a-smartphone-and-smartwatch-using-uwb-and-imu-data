@@ -4,12 +4,12 @@ How success is measured. Describe only the metrics, targets, and evaluation proc
 
 ## Metrics
 
-<!-- What metrics are used? How are they computed? What does higher/lower mean? -->
+The main metric is median positional error in centimeters for elbow and wrist joints, computed as Euclidean distance between predicted and ground-truth 3-D joint coordinates after scaling normalized coordinates by arm span. Lower is better. Supporting metrics include per-joint median error, mean elbow+wrist error, and mean absolute error for range correction.
 
 ## Baselines and Targets
 
-<!-- What performance levels exist as reference points? Include the paper's reported numbers as targets, and any standard baselines. A scientist agent should know what "good" looks like. -->
+The paper reports 11.0 cm median elbow+wrist error, with 8.7 cm elbow and 13.3 cm wrist median error. The IMU-only ablation reports 14.2 cm median elbow+wrist error, with 11.7 cm elbow and 16.7 cm wrist. For range correction, the paper reports raw UWB mean error of 21.0 cm and corrected UWB mean error of 8.6 cm.
 
 ## Evaluation Protocol
 
-<!-- How should evaluation be run? What data split, what conditions? Any important details about how to compare fairly (e.g., fixed seeds, specific test sets, averaging over runs). -->
+The original study uses leave-one-participant-out cross validation over 10 participants and reports results across daily activities plus gross motor arm motions. This environment uses a synthetic substitute split with the final subject held out, because the paper's cited repository is unavailable. Evaluation reads prediction artifacts from `checkpoints/*/predictions.npz` and writes `scoring/scores.json`; it does not import from `method/`.
