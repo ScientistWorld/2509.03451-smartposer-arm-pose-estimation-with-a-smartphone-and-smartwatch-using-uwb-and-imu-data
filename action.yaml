@@ -27,8 +27,8 @@
 #   milestone: core_claim
 #   notes: "Reproduced the core claim. Environment packaged."
 
-action: submit
+action: done
 gpus: 0
 test: true
-milestone: method_runs
-notes: "CPU test job: regenerate harder synthetic UWB data, train IMU-only baseline for 45 epochs and SmartPoser for 60 epochs with stronger UWB loss, evaluate core claim metrics."
+milestone: core_claim
+notes: "Core claim reproduced on the documented synthetic substitute benchmark: SmartPoser improves pose over IMU-only and reduces structured UWB range error. Environment packaged and validated."
