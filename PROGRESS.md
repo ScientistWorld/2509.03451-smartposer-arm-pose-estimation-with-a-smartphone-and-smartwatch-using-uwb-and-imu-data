@@ -3,6 +3,7 @@
 ## What Works
 
 - Paper analysis is complete for the core SmartPoser claims and reported metrics.
+- An independent paper-read subagent confirmed the reproduction-critical algorithm details: two-stage UWB-correction plus pose-estimation BiLSTMs, 125-frame windows, n-5 output scoring, end-to-end summed UWB MSE + MPJPE training, subject-disjoint evaluation, IMU-only ablation, and raw-vs-corrected UWB metrics.
 - `method/` contains a faithful two-stage SmartPoser implementation: UWB correction BiLSTM followed by pose-estimation BiLSTM, trained with the summed UWB MSE and MPJPE losses.
 - `data/` contains a method-agnostic synthetic substitute generator because the cited public repository is currently unavailable.
 - `eval/` reads prediction artifacts and writes `scoring/scores.json` without importing from `method/`.
@@ -13,6 +14,7 @@
 - Job `1ee26c07-551` ran the corrected 10-fold substitute benchmark successfully and passed `python validate.py --compare`. The corrected run restores `core_claim` on the packaged substitute benchmark.
 - The IMU-only baseline has been decoupled from `method/` so baseline training no longer imports the proposed method module.
 - Job `45fc335a-49e` ran the corrected 10-fold substitute benchmark after the continuation audit fixes: rolling one-frame test windows, 5 Hz raw UWB repeated to 25 Hz, and phone-relative watch orientation/acceleration. The job passed `python validate.py --compare` and restores `core_claim` for the current revision.
+- On 2026-06-02 12:52, the default evaluator was hardened to emit the robustness/constraint metrics already used by the train/test evaluators: p90 pose error, high-motion pose error, forearm-length error, corrected UWB p90, hard-UWB improvement, and UWB correction win rate. A CPU validation job is being submitted because bare login-node Python lacks NumPy.
 
 ## Results
 

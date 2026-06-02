@@ -1,5 +1,5 @@
-action: done
+action: submit
 gpus: 0
-test: false
+test: true
 milestone: core_claim
-notes: "Packaging audit complete: download.sh regenerates required synthetic data and scripts now use repo-relative paths."
+notes: "CPU validation job: recompute scores.json with richer evaluator metrics from existing artifacts, run train/test evaluators, and validate --compare."
