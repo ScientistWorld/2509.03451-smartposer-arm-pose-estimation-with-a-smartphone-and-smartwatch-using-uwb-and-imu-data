@@ -1,5 +1,5 @@
-action: done
-gpus: 0
+action: submit
+gpus: 1
 test: false
 milestone: core_claim
-notes: "Final verification passed; workspace is ready for gym use at core_claim with synthetic substitute data."
+notes: "Regenerate SmartPoser artifacts from source and evaluate the existing combined setting plus a gross-motor synthetic extension. Keep milestone at core_claim until the new setting validates."

@@ -50,6 +50,7 @@ def main() -> None:
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--uwb-loss-weight", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=17)
+    ap.add_argument("--experiment-name", default="pose_tracking_synthetic")
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
@@ -88,6 +89,7 @@ def main() -> None:
                 "uwb_loss_weight": args.uwb_loss_weight,
                 "epochs": args.epochs,
                 "data_dir": str(args.data_dir),
+                "experiment_name": args.experiment_name,
             },
             indent=2,
         )

@@ -14,7 +14,8 @@
 - Job `1ee26c07-551` ran the corrected 10-fold substitute benchmark successfully and passed `python validate.py --compare`. The corrected run restores `core_claim` on the packaged substitute benchmark.
 - The IMU-only baseline has been decoupled from `method/` so baseline training no longer imports the proposed method module.
 - Job `45fc335a-49e` ran the corrected 10-fold substitute benchmark after the continuation audit fixes: rolling one-frame test windows, 5 Hz raw UWB repeated to 25 Hz, and phone-relative watch orientation/acceleration. The job passed `python validate.py --compare` and restores `core_claim` for the current revision.
-- On 2026-06-02 12:52, the default evaluator was hardened to emit the robustness/constraint metrics already used by the train/test evaluators: p90 pose error, high-motion pose error, forearm-length error, corrected UWB p90, hard-UWB improvement, and UWB correction win rate. A CPU validation job is being submitted because bare login-node Python lacks NumPy.
+- On 2026-06-02 12:52, the default evaluator was hardened to emit the robustness/constraint metrics already used by the train/test evaluators: p90 pose error, high-motion pose error, forearm-length error, corrected UWB p90, hard-UWB improvement, and UWB correction win rate.
+- On 2026-06-02 13:02, `scripts/run.sh` was fixed to regenerate synthetic data and prediction artifacts from source instead of relying on gitignored checkpoints. The same patch adds a gross-motor synthetic setting for a possible `core_claim_plus` result after scheduler validation.
 
 ## Results
 
@@ -42,6 +43,7 @@
   - Corrected UWB MAE: 9.48 cm.
   - Trainable parameters from metadata: IMU-only 40.777k, SmartPoser 44.698k.
 - Paper reference values: IMU-only median elbow+wrist error 14.2 cm, SmartPoser median elbow+wrist error 11.0 cm, raw UWB MAE 21.0 cm, corrected UWB MAE 8.6 cm.
+- Gross-motor extension results are pending the next scheduler job; no `core_claim_plus` result has been claimed yet.
 
 ## Remaining
 
@@ -52,7 +54,7 @@
 
 - The paper's cited GitHub repository returned "Repository not found" via `git ls-remote`.
 - The first synthetic split made raw UWB too clean on the held-out subject, which let pose improve but did not test the paper's UWB correction claim. The generator now applies more common pose-dependent occlusion and multipath bias.
-- The login-node Python environment does not have `numpy`, so `scripts/evaluate.sh` is expected to run in the packaged container/overlay or scheduler job environment. The completed compute job `38e42a1e-b7e` verified that path.
+- The login-node Python environment does not have `numpy`, so `scripts/evaluate.sh` is expected to run in the packaged container/overlay or scheduler job environment. The completed compute job `38e42a1e-b7e` verified that path. A local 2026-06-02 smoke run of `bash scripts/evaluate.sh` failed with `ModuleNotFoundError: No module named 'numpy'` after Python syntax checks and `python validate.py --compare` passed.
 - The first continuation audit downgraded the claimed milestone until the corrected protocol is run.
 - The corrected benchmark restores the core effect but does not reach the paper's 11.0 cm real-data primary metric. It is a substitute-data core reproduction, not a full paper-scale reproduction.
 

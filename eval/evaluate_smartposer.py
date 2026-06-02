@@ -31,6 +31,21 @@ def _metadata_param_count_k(prediction_path: Path) -> float:
     return float(metadata["param_count_k"])
 
 
+def _metadata(prediction_path: Path) -> dict:
+    metadata_path = prediction_path.parent / "metadata.json"
+    if not metadata_path.exists():
+        raise FileNotFoundError(f"Missing required metadata file: {metadata_path}")
+    return json.loads(metadata_path.read_text())
+
+
+def _experiment_name(prediction_path: Path) -> str:
+    metadata = _metadata(prediction_path)
+    name = metadata.get("experiment_name", "pose_tracking_synthetic")
+    if not isinstance(name, str) or not name:
+        raise ValueError(f"Invalid experiment_name in {prediction_path.parent / 'metadata.json'}")
+    return name
+
+
 def _load_concat(paths: list[Path]) -> dict[str, np.ndarray]:
     if not paths:
         raise FileNotFoundError("No prediction artifacts matched the requested path/pattern")
@@ -85,6 +100,21 @@ def summarize_uwb(paths: list[Path]) -> dict[str, float]:
     }
 
 
+def _uwb_experiment_name(pose_experiment_name: str) -> str:
+    if pose_experiment_name == "pose_tracking_synthetic":
+        return "uwb_correction_synthetic"
+    if pose_experiment_name.startswith("pose_tracking_"):
+        return "uwb_correction_" + pose_experiment_name[len("pose_tracking_") :]
+    return pose_experiment_name + "_uwb_correction"
+
+
+def _group_by_experiment(paths: list[Path]) -> dict[str, list[Path]]:
+    grouped: dict[str, list[Path]] = {}
+    for path in paths:
+        grouped.setdefault(_experiment_name(path), []).append(path)
+    return grouped
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--smartposer", default="checkpoints/smartposer*/predictions.npz")
@@ -102,15 +132,18 @@ def main() -> None:
         if not imu_paths:
             raise FileNotFoundError(f"Missing required IMU-only artifacts for pattern: {args.imu_only}")
 
-    results = {}
-    if imu_paths:
-        results["imu_only"] = summarize_pose(imu_paths)
-    if smartposer_paths:
-        results["smartposer"] = summarize_pose(smartposer_paths)
-    if results:
-        scores["experiments"]["pose_tracking_synthetic"] = {"results": results}
-    if smartposer_paths:
-        scores["experiments"]["uwb_correction_synthetic"] = {"results": {"smartposer": summarize_uwb(smartposer_paths)}}
+    for exp_name in sorted(set(_group_by_experiment(imu_paths)) | set(_group_by_experiment(smartposer_paths))):
+        exp_imu_paths = _group_by_experiment(imu_paths).get(exp_name, [])
+        exp_smartposer_paths = _group_by_experiment(smartposer_paths).get(exp_name, [])
+        results = {}
+        if exp_imu_paths:
+            results["imu_only"] = summarize_pose(exp_imu_paths)
+        if exp_smartposer_paths:
+            results["smartposer"] = summarize_pose(exp_smartposer_paths)
+        if results:
+            scores["experiments"][exp_name] = {"results": results}
+        if exp_smartposer_paths:
+            scores["experiments"][_uwb_experiment_name(exp_name)] = {"results": {"smartposer": summarize_uwb(exp_smartposer_paths)}}
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(scores, indent=2) + "\n")

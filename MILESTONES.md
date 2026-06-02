@@ -26,5 +26,10 @@
 - Refreshed `scoring/scores.json` so it includes the same robustness and constraint metrics exposed by the evaluator.
 - Cleaned method-agnostic documentation and kept the milestone at `core_claim`.
 
+### [2026-06-02 13:02] - core_claim
+- Fixed `scripts/run.sh` to regenerate data and prediction artifacts from source before evaluation, avoiding reliance on gitignored checkpoints.
+- Added a gross-motor synthetic benchmark setting aligned with the paper's second study phase.
+- `core_claim_plus` is not claimed yet; it requires the pending scheduler job to finish and produce validating scores.
+
 ## Current Limitation
 - Higher milestones require the original synchronized UWB/IMU/Kinect release or additional substitute benchmark settings beyond the current validated package.

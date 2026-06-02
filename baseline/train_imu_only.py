@@ -62,6 +62,7 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=45)
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)
+    ap.add_argument("--experiment-name", default="pose_tracking_synthetic")
     args = ap.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(19)
@@ -104,6 +105,7 @@ def main() -> None:
                 "param_count_k": param_count / 1000.0,
                 "epochs": args.epochs,
                 "data_dir": str(args.data_dir),
+                "experiment_name": args.experiment_name,
             },
             indent=2,
         )

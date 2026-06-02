@@ -75,15 +75,28 @@ def _windowize(arrays: dict[str, np.ndarray], split: str) -> dict[str, np.ndarra
     return {k: np.stack(v).astype(np.float32) for k, v in xs.items()}
 
 
-def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[str, np.ndarray]:
+def _angle_ranges(profile: str) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float], float]:
+    if profile == "daily":
+        # Front-of-body motions approximate the paper's daily activity phase.
+        return (-0.90, 1.05), (-0.70, 0.95), (0.35, 2.05), 0.80
+    if profile == "gross":
+        # Wider, more extreme poses approximate the gross motor phase.
+        return (-1.55, 1.55), (-1.25, 1.65), (0.15, 2.65), 1.20
+    if profile == "combined":
+        return (-1.35, 1.35), (-1.05, 1.45), (0.25, 2.45), 1.00
+    raise ValueError(f"unknown profile {profile!r}; expected daily, gross, or combined")
+
+
+def _make_sequence(rng: np.random.Generator, frames: int, subject: int, profile: str) -> dict[str, np.ndarray]:
     arm_span = rng.normal(1.70, 0.08)
     upper = arm_span * rng.normal(0.18, 0.012)
     fore = arm_span * rng.normal(0.165, 0.012)
     shoulder = np.zeros((frames, 3), dtype=np.float32)
 
-    yaw = _smooth_angles(rng, frames, -1.35, 1.35)
-    pitch = _smooth_angles(rng, frames, -1.05, 1.45)
-    elbow_flex = _smooth_angles(rng, frames, 0.25, 2.45)
+    yaw_range, pitch_range, elbow_range, uwb_bias_scale = _angle_ranges(profile)
+    yaw = _smooth_angles(rng, frames, *yaw_range)
+    pitch = _smooth_angles(rng, frames, *pitch_range)
+    elbow_flex = _smooth_angles(rng, frames, *elbow_range)
     wrist_roll = _smooth_angles(rng, frames, -1.2, 1.2)
 
     upper_rot = _matmul(_rot_z(yaw), _rot_y(pitch))
@@ -111,7 +124,7 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
         + 0.05 * np.maximum(wrist[:, 1] + 0.05, 0.0)
     ).astype(np.float32)
     burst = 0.025 * (np.sin(np.linspace(0, rng.uniform(4, 8) * np.pi, frames) + rng.uniform(0, np.pi)) + 1.0)
-    structured = body_occ.astype(np.float32) * (occ_strength + burst.astype(np.float32))
+    structured = body_occ.astype(np.float32) * (occ_strength + burst.astype(np.float32)) * uwb_bias_scale
     raw_dist_continuous = true_dist + structured + rng.normal(0, 0.035, size=frames).astype(np.float32)
     raw_dist_continuous = np.maximum(raw_dist_continuous, 0.03)
     # UWB arrives at roughly 5 Hz in the paper and is upsampled to the 25 Hz
@@ -151,7 +164,14 @@ def _make_sequence(rng: np.random.Generator, frames: int, subject: int) -> dict[
     }
 
 
-def build_dataset(out_dir: Path, subjects: int = 10, frames: int = 1000, seed: int = 7, test_subject: int | None = None) -> None:
+def build_dataset(
+    out_dir: Path,
+    subjects: int = 10,
+    frames: int = 1000,
+    seed: int = 7,
+    test_subject: int | None = None,
+    profile: str = "combined",
+) -> None:
     rng = np.random.default_rng(seed)
     out_dir.mkdir(parents=True, exist_ok=True)
     if test_subject is None:
@@ -160,7 +180,7 @@ def build_dataset(out_dir: Path, subjects: int = 10, frames: int = 1000, seed: i
         raise ValueError(f"test_subject must be in [0, {subjects}), got {test_subject}")
     train_parts, test_parts = [], []
     for sid in range(subjects):
-        seq = _make_sequence(rng, frames, sid)
+        seq = _make_sequence(rng, frames, sid, profile)
         if sid == test_subject:
             test_parts.append(seq)
         else:
@@ -169,6 +189,9 @@ def build_dataset(out_dir: Path, subjects: int = 10, frames: int = 1000, seed: i
     test = {k: np.concatenate([p[k] for p in test_parts], axis=0) for k in test_parts[0]}
     np.savez_compressed(out_dir / "train_windows.npz", **_windowize(train, "train"))
     np.savez_compressed(out_dir / "test_windows.npz", **_windowize(test, "test"))
+    (out_dir / "metadata.json").write_text(
+        f'{{"subjects": {subjects}, "frames": {frames}, "seed": {seed}, "test_subject": {test_subject}, "profile": "{profile}"}}\n'
+    )
 
 
 def main() -> None:
@@ -178,8 +201,9 @@ def main() -> None:
     ap.add_argument("--frames", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--test-subject", type=int, default=None)
+    ap.add_argument("--profile", choices=["combined", "daily", "gross"], default="combined")
     args = ap.parse_args()
-    build_dataset(args.out, args.subjects, args.frames, args.seed, args.test_subject)
+    build_dataset(args.out, args.subjects, args.frames, args.seed, args.test_subject, args.profile)
 
 
 if __name__ == "__main__":
