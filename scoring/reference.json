@@ -1,15 +1,18 @@
 {
   "experiments": {
     "pose_tracking_synthetic": {
-      "description": "Arm pose tracking with 10-fold leave-one-synthetic-subject-out substitute data; paper reference values are from the combined gross motor plus daily activities study (Table 1 and Figure 10).",
+      "description": "Arm pose tracking with 10-fold leave-one-synthetic-subject-out substitute data; lower joint-position error indicates better wearable pose estimation.",
       "weight": 0.7,
       "primary_metric": "median_elbow_wrist_cm",
       "metrics": {
-        "median_elbow_cm": {"higher_is_better": false, "coefficient": -0.6},
-        "median_wrist_cm": {"higher_is_better": false, "coefficient": -0.6},
-        "median_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -1.0},
-        "mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.4},
-        "param_count_k": {"higher_is_better": false, "coefficient": -0.2}
+        "median_elbow_cm": {"higher_is_better": false, "coefficient": -0.5, "description": "Median 3-D elbow position error at the target output frame."},
+        "median_wrist_cm": {"higher_is_better": false, "coefficient": -0.5, "description": "Median 3-D wrist position error at the target output frame."},
+        "median_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -1.0, "description": "Headline central pose error over elbow and wrist predictions."},
+        "mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Average elbow/wrist position error, adding sensitivity to broad degradation hidden by medians."},
+        "p90_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.45, "description": "Ninetieth-percentile elbow/wrist error to catch methods that only optimize typical poses."},
+        "high_motion_mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Mean elbow/wrist error on the highest-motion quartile of windows."},
+        "forearm_length_mae_cm": {"higher_is_better": false, "coefficient": -0.25, "description": "Predicted forearm-length error, penalizing geometrically implausible pose shortcuts."},
+        "param_count_k": {"higher_is_better": false, "coefficient": -0.2, "description": "Trainable parameter count in thousands, preserving the small-model constraint."}
       },
       "results": {
         "imu_only": {
@@ -31,13 +34,16 @@
       }
     },
     "uwb_correction_synthetic": {
-      "description": "UWB correction quality; paper reference values are from the raw-vs-corrected UWB distance analysis (Figure 7).",
+      "description": "UWB correction quality; better methods reduce noisy phone-watch range error without only improving easy samples.",
       "weight": 0.3,
       "primary_metric": "corrected_uwb_mae_cm",
       "metrics": {
-        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": -0.2},
-        "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": -1.0},
-        "uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.6}
+        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": -0.1, "description": "Mean raw range error before correction, reported as context for correction difficulty."},
+        "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": -1.0, "description": "Headline mean absolute error after range correction."},
+        "corrected_uwb_p90_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Ninetieth-percentile corrected range error, detecting brittle correction on difficult samples."},
+        "uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.55, "description": "Mean error reduction from raw to corrected range."},
+        "hard_uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.35, "description": "Error reduction on the highest raw-error quartile, targeting occlusion-like range failures."},
+        "uwb_correction_win_rate": {"higher_is_better": true, "coefficient": 0.25, "description": "Fraction of evaluated windows where correction improves over the raw range."}
       },
       "results": {
         "smartposer": {
