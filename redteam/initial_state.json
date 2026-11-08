@@ -1,0 +1,11 @@
+{
+  "base_commit": "b56913ea805e495b6533751239ce44e55e26288e",
+  "initial_status": " M README.md\n M manifest.json\n D trajectory/turn_0001_raw.jsonl\n D trajectory/turn_0002_raw.jsonl\n D trajectory/turn_0003_raw.jsonl\n D trajectory/turn_0004_raw.jsonl\n?? redteam/\n",
+  "files": {
+    "scripts/run.sh": "d1ff0c6d54392293fac8b5f32b0cacd1aba3135afc23402143ad0a05d0747bb5",
+    "action.yaml": "070beaf904ced86d44de0ed2f0d482ab2a7655fbe1ca55bab4f5f7a2d50cc203",
+    "scoring/scores_train.json": "6b9f1c9edf116dde5395a420c4c252a7ba2c5ecafc29bea4bb668690a9e09ab6",
+    "scoring/scores_test.json": "7421cacf154658d44de1641c024669b0cb2e6a6a3c9a6d91dc6db7c752fab1d4",
+    "scoring/scores.json": "d1a9bd1332fb51e925cd986e4af03e5160edbeb692672820b76da75c33193f8b"
+  }
+}
