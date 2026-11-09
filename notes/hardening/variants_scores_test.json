@@ -1,0 +1,489 @@
+{
+  "slice": "test",
+  "experiments": {
+    "pose_tracking_synthetic": {
+      "results": {
+        "imu_only": {
+          "median_elbow_cm": 8.942869639875923,
+          "median_wrist_cm": 9.708641360778266,
+          "median_elbow_wrist_cm": 9.328791638012145,
+          "mean_elbow_wrist_cm": 10.481793518417536,
+          "p90_elbow_wrist_cm": 18.69914290529194,
+          "high_motion_mean_elbow_wrist_cm": 10.433827932728134,
+          "param_count_k": 40.777
+        },
+        "mean_pose": {
+          "median_elbow_cm": 18.35314651048471,
+          "median_wrist_cm": 27.8162170765599,
+          "median_elbow_wrist_cm": 22.683811437686792,
+          "mean_elbow_wrist_cm": 24.21332126994656,
+          "p90_elbow_wrist_cm": 38.08485994132419,
+          "high_motion_mean_elbow_wrist_cm": 26.466512635538926,
+          "param_count_k": 0.009
+        },
+        "smartposer": {
+          "median_elbow_cm": 7.614688027451024,
+          "median_wrist_cm": 8.236608895305347,
+          "median_elbow_wrist_cm": 7.934008038857277,
+          "mean_elbow_wrist_cm": 8.983398819132274,
+          "p90_elbow_wrist_cm": 16.089939056821226,
+          "high_motion_mean_elbow_wrist_cm": 9.054190321045079,
+          "param_count_k": 44.698
+        },
+        "smartposer_e1": {
+          "median_elbow_cm": 18.35314651048471,
+          "median_wrist_cm": 27.8162170765599,
+          "median_elbow_wrist_cm": 22.683811437686792,
+          "mean_elbow_wrist_cm": 24.21332126994656,
+          "p90_elbow_wrist_cm": 38.08485994132419,
+          "high_motion_mean_elbow_wrist_cm": 26.466512635538926,
+          "param_count_k": 44.698
+        },
+        "smartposer_e100": {
+          "median_elbow_cm": 8.081708652660522,
+          "median_wrist_cm": 8.896076417855053,
+          "median_elbow_wrist_cm": 8.489967339135166,
+          "mean_elbow_wrist_cm": 9.619421143980926,
+          "p90_elbow_wrist_cm": 17.30874365242079,
+          "high_motion_mean_elbow_wrist_cm": 9.476706071462033,
+          "param_count_k": 44.698
+        },
+        "smartposer_e200": {
+          "median_elbow_cm": 7.777863752455369,
+          "median_wrist_cm": 8.726767828430612,
+          "median_elbow_wrist_cm": 8.268392512446194,
+          "mean_elbow_wrist_cm": 9.34896458352069,
+          "p90_elbow_wrist_cm": 16.603805051338128,
+          "high_motion_mean_elbow_wrist_cm": 9.24849303013519,
+          "param_count_k": 44.698
+        },
+        "smartposer_e25": {
+          "median_elbow_cm": 10.329864330996145,
+          "median_wrist_cm": 11.200215138064813,
+          "median_elbow_wrist_cm": 10.76804077807379,
+          "mean_elbow_wrist_cm": 11.821516830862103,
+          "p90_elbow_wrist_cm": 20.421022173607074,
+          "high_motion_mean_elbow_wrist_cm": 11.44961567895668,
+          "param_count_k": 44.698
+        },
+        "smartposer_e300": {
+          "median_elbow_cm": 7.636099246456102,
+          "median_wrist_cm": 8.387364176985711,
+          "median_elbow_wrist_cm": 8.012818979589639,
+          "mean_elbow_wrist_cm": 9.101832963075541,
+          "p90_elbow_wrist_cm": 16.27751896014721,
+          "high_motion_mean_elbow_wrist_cm": 9.130763703018106,
+          "param_count_k": 44.698
+        },
+        "smartposer_e50": {
+          "median_elbow_cm": 9.630433188582678,
+          "median_wrist_cm": 10.42268272419214,
+          "median_elbow_wrist_cm": 10.024199506003578,
+          "mean_elbow_wrist_cm": 11.128997118256002,
+          "p90_elbow_wrist_cm": 19.7226533629825,
+          "high_motion_mean_elbow_wrist_cm": 10.720077320681666,
+          "param_count_k": 44.698
+        },
+        "smartposer_e800": {
+          "median_elbow_cm": 7.544170399562187,
+          "median_wrist_cm": 8.119964455204643,
+          "median_elbow_wrist_cm": 7.839015532407741,
+          "mean_elbow_wrist_cm": 8.955461033673693,
+          "p90_elbow_wrist_cm": 16.122940749346686,
+          "high_motion_mean_elbow_wrist_cm": 8.948981012648726,
+          "param_count_k": 44.698
+        },
+        "smartposer_offsets": {
+          "median_elbow_cm": 7.602902657810767,
+          "median_wrist_cm": 8.239866981515886,
+          "median_elbow_wrist_cm": 7.92327547719039,
+          "mean_elbow_wrist_cm": 8.97981729327777,
+          "p90_elbow_wrist_cm": 16.08602534548655,
+          "high_motion_mean_elbow_wrist_cm": 8.973117950519415,
+          "param_count_k": 44.698
+        },
+        "smartposer_seed18": {
+          "median_elbow_cm": 7.3169366992047475,
+          "median_wrist_cm": 7.9989448661931135,
+          "median_elbow_wrist_cm": 7.662613144925945,
+          "mean_elbow_wrist_cm": 8.781451003469492,
+          "p90_elbow_wrist_cm": 15.791584523477812,
+          "high_motion_mean_elbow_wrist_cm": 8.857418290200137,
+          "param_count_k": 44.698
+        },
+        "smartposer_seed19": {
+          "median_elbow_cm": 7.619940790242749,
+          "median_wrist_cm": 8.348141960700229,
+          "median_elbow_wrist_cm": 7.98954544541532,
+          "mean_elbow_wrist_cm": 9.027356758121396,
+          "p90_elbow_wrist_cm": 15.997468042083801,
+          "high_motion_mean_elbow_wrist_cm": 9.044925066881335,
+          "param_count_k": 44.698
+        },
+        "smartposer_wider": {
+          "median_elbow_cm": 7.462895518754271,
+          "median_wrist_cm": 8.114843734679171,
+          "median_elbow_wrist_cm": 7.793442770638453,
+          "mean_elbow_wrist_cm": 8.874392046296478,
+          "p90_elbow_wrist_cm": 15.911328252183434,
+          "high_motion_mean_elbow_wrist_cm": 8.857423987220072,
+          "param_count_k": 89.658
+        }
+      }
+    },
+    "uwb_correction_synthetic": {
+      "results": {
+        "raw_uwb": {
+          "corrected_uwb_mae_cm": 13.414231680816988,
+          "corrected_uwb_p90_cm": 34.018770622417804,
+          "occluded_uwb_mae_cm": 32.82311482061534,
+          "uwb_correction_win_rate": 0.0
+        },
+        "smartposer": {
+          "corrected_uwb_mae_cm": 4.24718183575705,
+          "corrected_uwb_p90_cm": 8.662430040309705,
+          "occluded_uwb_mae_cm": 5.06357345259709,
+          "uwb_correction_win_rate": 0.7498697916666667
+        },
+        "smartposer_e1": {
+          "corrected_uwb_mae_cm": 13.414231680816988,
+          "corrected_uwb_p90_cm": 34.018770622417804,
+          "occluded_uwb_mae_cm": 32.82311482061534,
+          "uwb_correction_win_rate": 0.0
+        },
+        "smartposer_e100": {
+          "corrected_uwb_mae_cm": 4.528927862364521,
+          "corrected_uwb_p90_cm": 9.452276895187843,
+          "occluded_uwb_mae_cm": 4.929176859955466,
+          "uwb_correction_win_rate": 0.7247287326388889
+        },
+        "smartposer_e200": {
+          "corrected_uwb_mae_cm": 4.32424738201704,
+          "corrected_uwb_p90_cm": 8.937896848883403,
+          "occluded_uwb_mae_cm": 5.03345630217722,
+          "uwb_correction_win_rate": 0.7434244791666667
+        },
+        "smartposer_e25": {
+          "corrected_uwb_mae_cm": 6.243474584670264,
+          "corrected_uwb_p90_cm": 12.691732882302137,
+          "occluded_uwb_mae_cm": 5.889687148886411,
+          "uwb_correction_win_rate": 0.6382595486111111
+        },
+        "smartposer_e300": {
+          "corrected_uwb_mae_cm": 4.2621416688569,
+          "corrected_uwb_p90_cm": 8.728617917353247,
+          "occluded_uwb_mae_cm": 5.0655101720595335,
+          "uwb_correction_win_rate": 0.7490993923611111
+        },
+        "smartposer_e50": {
+          "corrected_uwb_mae_cm": 5.09178610935574,
+          "corrected_uwb_p90_cm": 10.47890397203826,
+          "occluded_uwb_mae_cm": 4.803885699721776,
+          "uwb_correction_win_rate": 0.6816731770833333
+        },
+        "smartposer_e800": {
+          "corrected_uwb_mae_cm": 4.164127360868875,
+          "corrected_uwb_p90_cm": 8.51319396298301,
+          "occluded_uwb_mae_cm": 4.898154885236448,
+          "uwb_correction_win_rate": 0.7541015625
+        },
+        "smartposer_offsets": {
+          "corrected_uwb_mae_cm": 4.2949632318088184,
+          "corrected_uwb_p90_cm": 8.74553111135164,
+          "occluded_uwb_mae_cm": 5.005295313002454,
+          "uwb_correction_win_rate": 0.7460177951388889
+        },
+        "smartposer_seed18": {
+          "corrected_uwb_mae_cm": 4.3127788306732695,
+          "corrected_uwb_p90_cm": 8.753998116917684,
+          "occluded_uwb_mae_cm": 5.39431286026081,
+          "uwb_correction_win_rate": 0.7503146701388889
+        },
+        "smartposer_seed19": {
+          "corrected_uwb_mae_cm": 4.646505184487708,
+          "corrected_uwb_p90_cm": 9.674932899205688,
+          "occluded_uwb_mae_cm": 5.547445514403519,
+          "uwb_correction_win_rate": 0.7292209201388888
+        },
+        "smartposer_wider": {
+          "corrected_uwb_mae_cm": 4.3064549693630205,
+          "corrected_uwb_p90_cm": 8.868856119452673,
+          "occluded_uwb_mae_cm": 5.22503806572176,
+          "uwb_correction_win_rate": 0.7486111111111111
+        }
+      }
+    }
+  },
+  "_status": {
+    "imu_only": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 40777,
+      "storage_bytes": 163108,
+      "pose": {
+        "median_elbow_cm": 8.942869639875923,
+        "median_wrist_cm": 9.708641360778266,
+        "median_elbow_wrist_cm": 9.328791638012145,
+        "mean_elbow_wrist_cm": 10.481793518417536,
+        "p90_elbow_wrist_cm": 18.69914290529194,
+        "high_motion_mean_elbow_wrist_cm": 10.433827932728134
+      }
+    },
+    "smartposer": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.614688027451024,
+        "median_wrist_cm": 8.236608895305347,
+        "median_elbow_wrist_cm": 7.934008038857277,
+        "mean_elbow_wrist_cm": 8.983398819132274,
+        "p90_elbow_wrist_cm": 16.089939056821226,
+        "high_motion_mean_elbow_wrist_cm": 9.054190321045079
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.24718183575705,
+        "corrected_uwb_p90_cm": 8.662430040309705,
+        "occluded_uwb_mae_cm": 5.06357345259709,
+        "uwb_correction_win_rate": 0.7498697916666667
+      }
+    },
+    "smartposer_e1": {
+      "valid": false,
+      "reasons": [
+        "pose error not below the constant-pose floor (mean_pose)",
+        "range error not below the raw UWB stream (raw_uwb)"
+      ],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 23.52960040628381,
+        "median_wrist_cm": 25.911326233633694,
+        "median_elbow_wrist_cm": 24.459218146660064,
+        "mean_elbow_wrist_cm": 25.391818758822268,
+        "p90_elbow_wrist_cm": 36.58510584340714,
+        "high_motion_mean_elbow_wrist_cm": 26.5839330444296
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 24.91950820168637,
+        "corrected_uwb_p90_cm": 42.66235778685871,
+        "occluded_uwb_mae_cm": 29.382156809754047,
+        "uwb_correction_win_rate": 0.21295572916666666
+      }
+    },
+    "smartposer_e100": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 8.081708652660522,
+        "median_wrist_cm": 8.896076417855053,
+        "median_elbow_wrist_cm": 8.489967339135166,
+        "mean_elbow_wrist_cm": 9.619421143980926,
+        "p90_elbow_wrist_cm": 17.30874365242079,
+        "high_motion_mean_elbow_wrist_cm": 9.476706071462033
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.528927862364521,
+        "corrected_uwb_p90_cm": 9.452276895187843,
+        "occluded_uwb_mae_cm": 4.929176859955466,
+        "uwb_correction_win_rate": 0.7247287326388889
+      }
+    },
+    "smartposer_e200": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.777863752455369,
+        "median_wrist_cm": 8.726767828430612,
+        "median_elbow_wrist_cm": 8.268392512446194,
+        "mean_elbow_wrist_cm": 9.34896458352069,
+        "p90_elbow_wrist_cm": 16.603805051338128,
+        "high_motion_mean_elbow_wrist_cm": 9.24849303013519
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.32424738201704,
+        "corrected_uwb_p90_cm": 8.937896848883403,
+        "occluded_uwb_mae_cm": 5.03345630217722,
+        "uwb_correction_win_rate": 0.7434244791666667
+      }
+    },
+    "smartposer_e25": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 10.329864330996145,
+        "median_wrist_cm": 11.200215138064813,
+        "median_elbow_wrist_cm": 10.76804077807379,
+        "mean_elbow_wrist_cm": 11.821516830862103,
+        "p90_elbow_wrist_cm": 20.421022173607074,
+        "high_motion_mean_elbow_wrist_cm": 11.44961567895668
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 6.243474584670264,
+        "corrected_uwb_p90_cm": 12.691732882302137,
+        "occluded_uwb_mae_cm": 5.889687148886411,
+        "uwb_correction_win_rate": 0.6382595486111111
+      }
+    },
+    "smartposer_e300": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.636099246456102,
+        "median_wrist_cm": 8.387364176985711,
+        "median_elbow_wrist_cm": 8.012818979589639,
+        "mean_elbow_wrist_cm": 9.101832963075541,
+        "p90_elbow_wrist_cm": 16.27751896014721,
+        "high_motion_mean_elbow_wrist_cm": 9.130763703018106
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.2621416688569,
+        "corrected_uwb_p90_cm": 8.728617917353247,
+        "occluded_uwb_mae_cm": 5.0655101720595335,
+        "uwb_correction_win_rate": 0.7490993923611111
+      }
+    },
+    "smartposer_e50": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 9.630433188582678,
+        "median_wrist_cm": 10.42268272419214,
+        "median_elbow_wrist_cm": 10.024199506003578,
+        "mean_elbow_wrist_cm": 11.128997118256002,
+        "p90_elbow_wrist_cm": 19.7226533629825,
+        "high_motion_mean_elbow_wrist_cm": 10.720077320681666
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 5.09178610935574,
+        "corrected_uwb_p90_cm": 10.47890397203826,
+        "occluded_uwb_mae_cm": 4.803885699721776,
+        "uwb_correction_win_rate": 0.6816731770833333
+      }
+    },
+    "smartposer_e800": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.544170399562187,
+        "median_wrist_cm": 8.119964455204643,
+        "median_elbow_wrist_cm": 7.839015532407741,
+        "mean_elbow_wrist_cm": 8.955461033673693,
+        "p90_elbow_wrist_cm": 16.122940749346686,
+        "high_motion_mean_elbow_wrist_cm": 8.948981012648726
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.164127360868875,
+        "corrected_uwb_p90_cm": 8.51319396298301,
+        "occluded_uwb_mae_cm": 4.898154885236448,
+        "uwb_correction_win_rate": 0.7541015625
+      }
+    },
+    "smartposer_offsets": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.602902657810767,
+        "median_wrist_cm": 8.239866981515886,
+        "median_elbow_wrist_cm": 7.92327547719039,
+        "mean_elbow_wrist_cm": 8.97981729327777,
+        "p90_elbow_wrist_cm": 16.08602534548655,
+        "high_motion_mean_elbow_wrist_cm": 8.973117950519415
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.2949632318088184,
+        "corrected_uwb_p90_cm": 8.74553111135164,
+        "occluded_uwb_mae_cm": 5.005295313002454,
+        "uwb_correction_win_rate": 0.7460177951388889
+      }
+    },
+    "smartposer_seed18": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.3169366992047475,
+        "median_wrist_cm": 7.9989448661931135,
+        "median_elbow_wrist_cm": 7.662613144925945,
+        "mean_elbow_wrist_cm": 8.781451003469492,
+        "p90_elbow_wrist_cm": 15.791584523477812,
+        "high_motion_mean_elbow_wrist_cm": 8.857418290200137
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.3127788306732695,
+        "corrected_uwb_p90_cm": 8.753998116917684,
+        "occluded_uwb_mae_cm": 5.39431286026081,
+        "uwb_correction_win_rate": 0.7503146701388889
+      }
+    },
+    "smartposer_seed19": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.619940790242749,
+        "median_wrist_cm": 8.348141960700229,
+        "median_elbow_wrist_cm": 7.98954544541532,
+        "mean_elbow_wrist_cm": 9.027356758121396,
+        "p90_elbow_wrist_cm": 15.997468042083801,
+        "high_motion_mean_elbow_wrist_cm": 9.044925066881335
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.646505184487708,
+        "corrected_uwb_p90_cm": 9.674932899205688,
+        "occluded_uwb_mae_cm": 5.547445514403519,
+        "uwb_correction_win_rate": 0.7292209201388888
+      }
+    },
+    "smartposer_wider": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 89658,
+      "storage_bytes": 358632,
+      "pose": {
+        "median_elbow_cm": 7.462895518754271,
+        "median_wrist_cm": 8.114843734679171,
+        "median_elbow_wrist_cm": 7.793442770638453,
+        "mean_elbow_wrist_cm": 8.874392046296478,
+        "p90_elbow_wrist_cm": 15.911328252183434,
+        "high_motion_mean_elbow_wrist_cm": 8.857423987220072
+      },
+      "range": {
+        "corrected_uwb_mae_cm": 4.3064549693630205,
+        "corrected_uwb_p90_cm": 8.868856119452673,
+        "occluded_uwb_mae_cm": 5.22503806572176,
+        "uwb_correction_win_rate": 0.7486111111111111
+      }
+    }
+  },
+  "_meta": {
+    "simulator": "smartposer-sim-v2",
+    "participants": 16,
+    "frames_per_participant": 3000,
+    "windows_per_fold_model": 9216,
+    "folds": 10,
+    "target_index": 119,
+    "stride": 5,
+    "param_limit": 92800,
+    "storage_limit_bytes": 742400,
+    "device": "cuda",
+    "skipped": []
+  }
+}

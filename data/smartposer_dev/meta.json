@@ -1,0 +1,19 @@
+{
+  "simulator": "smartposer-sim-v2",
+  "subjects": 10,
+  "frames_per_subject": 12000,
+  "fps": 25,
+  "feature_layout": [
+    "0: raw UWB phone-watch range / arm span (5 Hz, held)",
+    "1-9: phone orientation estimate (row-major 3x3)",
+    "10-18: watch orientation estimate in the phone frame (row-major 3x3)",
+    "19-21: phone acceleration / 30",
+    "22-24: watch acceleration in the phone frame / 30"
+  ],
+  "targets": {
+    "joints": "shoulder, elbow, wrist xyz in the shoulder frame / arm span (9 values)",
+    "true_distance": "true phone-watch distance / arm span",
+    "arm_span": "participant arm span in metres",
+    "phase": "0 = daily-activity phase, 1 = gross-motor phase"
+  }
+}
