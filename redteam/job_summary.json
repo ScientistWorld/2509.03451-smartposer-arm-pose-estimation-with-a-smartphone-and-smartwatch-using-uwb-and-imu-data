@@ -1,0 +1,13 @@
+{
+  "job_id": "7cf388e9-f4f",
+  "returncode": 0,
+  "duration_seconds": 240.0819685459137,
+  "gpus": 1,
+  "cpus": 1,
+  "resource": "gpu-2",
+  "started_at": 1794232948.8018696,
+  "completed_at": 1794233188.8838382,
+  "case_count": 20,
+  "torch": "2.12.0+cu130",
+  "numpy": "2.4.6"
+}

@@ -1,0 +1,23 @@
+{
+  "base_commit": "b56913ea805e495b6533751239ce44e55e26288e",
+  "tracked_files_checked": 97,
+  "preserved_preexisting_differences": [
+    "README.md",
+    "manifest.json",
+    "trajectory/turn_0001_raw.jsonl",
+    "trajectory/turn_0002_raw.jsonl",
+    "trajectory/turn_0003_raw.jsonl",
+    "trajectory/turn_0004_raw.jsonl"
+  ],
+  "protocol_exception": "action.yaml must signal done",
+  "initial_sha256_checks": {
+    "scripts/run.sh": true,
+    "scoring/scores_train.json": true,
+    "scoring/scores_test.json": true,
+    "scoring/scores.json": true
+  },
+  "checkpoint_files_checked": 51,
+  "checkpoints_identical": true,
+  "problems": [],
+  "restored": true
+}

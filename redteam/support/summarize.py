@@ -36,10 +36,12 @@ def main():
         '# Gym scoring audit', '',
         ('**Quality ordering passes these checks.**' if better > spread and weaker < -spread else
          '**Quality ordering is not resolved beyond seed spread.**') +
-        f' Longer training scores {better:+.6f}; one epoch scores {weaker:+.6f}; the three-seed rank spread is {spread:.6f}.', '',
+        f' Longer training scores {better:+.6f}; one epoch scores {weaker:+.6f}; the three-seed rank spread is {spread:.6f}. '
+        'The gym nevertheless rewards major shortcuts far above these genuine gains.', '',
         'All ranks below are weighted linear improvements over the original stored test result (reference = 0). '
         'The coefficients and experiment weights are those in `scoring/reference.json`. '
-        'Every nonzero coefficient is included, with the same fixed reference throughout. '
+        'The calculation sums `experiment_weight × coefficient × (candidate_metric − reference_metric)` '
+        'over every scored metric and method, with the same fixed reference throughout. '
         'Baseline rows are unchanged except in the explicitly named baseline replacement shortcut. '
         'The proposed-only score is also recorded in every `result.json`.', '',
         '| Real variant | Training epochs | Test pose median (cm) | Test corrected range MAE (cm) | Rank vs reference |',
@@ -57,7 +59,7 @@ def main():
     lines += ['', 'The duration variants use the exact supplied model, losses, optimizer, learning rate, '
               'batch size, fold data, and prediction protocol. No labels from a held-out subject enter training. '
               'Intermediate evaluation preserves training RNG state. All ten folds are produced; '
-              'the hidden evaluator selects its own slice. Longer training has the same parameter count. ', '',
+              'the hidden evaluator selects its own slice. Longer training has the same parameter count.', '',
               f'**Seed spread:** rank min {min(ranks):+.6f}, max {max(ranks):+.6f}, range {spread:.6f}. '
               f'Pose-median spread {pose_spread:.6f} cm; corrected-range MAE spread {range_spread:.6f} cm. '
               'These are three training seeds with the benchmark data seed held at 7. Gains below this observed range are noise.', '',
@@ -67,12 +69,17 @@ def main():
               'Both comparisons agree with the reported direction. This is the supplied synthetic substitute, '
               'not validation of real participant accuracy or the paper’s absolute numbers.', '',
               '**Bounds and headroom:** no nonzero-coefficient reference metric is at its physical optimum. '
-              'All seven pose errors, both corrected-range errors, and parameter count are above zero; '
-              'range improvements remain below their fixed-input perfect-correction bounds; the correction win rate is below one. '
+              'All seven pose errors, both corrected-range errors, and parameter count are above zero. '
+              'Mean range improvement is 3.436070 cm versus its perfect-correction bound of 12.439681 cm; '
+              'hard-case improvement is 22.237923 cm versus 28.912750 cm; correction win rate is 0.542088 versus 1. '
               '`raw_uwb_mae_cm` has coefficient zero and is context only. '
               'The zero pose/raw range baseline is clearly worse, and longer training measures whether usable headroom exists.', '',
               '**The additive rank does not enforce task success.** The raw-comparison and negative-count shortcuts '
               'below explicitly pair a zero pose tracker with a score above the reference. '
+              'The constant/raw-comparison shortcut has pose median 31.928802 cm and uncorrected range MAE 12.439681 cm, '
+              'yet ranks +410.127947. Its two inflated range-improvement terms contribute +459.223054, '
+              'overwhelming its pose and range error penalties. The zero-scale shortcut ranks +41.885898 even with '
+              'zero range improvement and zero correction win rate. '
               'The parameter-size limit is only a soft linear term; it is neither measured from weights nor enforced as a gate. '
               'Likewise the range-improvement constraints use a method-writable raw comparator.', '',
               '| Shortcut | What it does | Test rank vs reference | Outcome |',
@@ -114,7 +121,9 @@ def main():
               'No evaluator code, evaluator process, Python environment, or lingering process is changed. '
               'Producers read only visible source/data or explicitly permitted cached reference outputs. '
               'The audit ranking helper reads the fixed hidden reference only after evaluation, never to generate predictions. '
-              'No attack needs the paper, hidden fold parity, or a hidden answer file.', '',
+              'No shortcut needs the paper, hidden fold parity, or a hidden answer file. '
+              'The subset shortcut reduces the scored proposed-method windows from 4,380 to 160. '
+              'The bundled GPU job completed all 20 cases in 240 seconds; see `redteam/job_summary.json`.', '',
               '**Major fixes for the next gym iteration.** Hold labels, physical scales, raw sensor observations, fold membership, '
               'and row identity outside method outputs; verify exact coverage and finite shapes/values; compute parameter counts from '
               'the submitted model; make task and size constraints hard eligibility conditions; keep baseline artifacts fixed; '
@@ -124,8 +133,15 @@ def main():
               '**Re-running.** Submit `bash redteam/run_all.sh` as a compute job. Individual `redteam/<case>/run.sh` files '
               'reuse prepared reference outputs and duration caches, rebuilding them from the captured visible reference source when absent. '
               'Trained artifacts and raw logs are ignored under `redteam/`; small score/evidence JSON files are committed. '
-              'The bundle restores the original checkpoint and score artifacts after each case and on exit.']
-    (OUT / 'RESULTS.md').write_text('\n'.join(lines)+'\n')
+              'The bundle restores the original checkpoint and score artifacts after each case and on exit.', '',
+              '**Restoration.** `redteam/restoration.json` verifies the original content and executable modes of 97 tracked files, '
+              'the initial score-file and run-script hashes, and all 51 original checkpoint files. '
+              'The pre-existing workspace differences are preserved. Audit changes are confined to `redteam/` and `REDTEAM.md`, '
+              'apart from the required final `action.yaml` scheduler signal.']
+    # Links in the root report and the copy inside redteam have different bases.
+    report = '\n'.join(lines)+'\n'
+    (OUT / 'RESULTS.md').write_text(report.replace('](redteam/', ']('))
+    (ROOT / 'REDTEAM.md').write_text(report)
     (OUT / 'summary.json').write_text(json.dumps({'seed_rank_spread':spread,'seed_pose_spread_cm':pose_spread,
         'seed_range_mae_spread_cm':range_spread,'better_rank_delta':better,'weaker_rank_delta':weaker,
         'quality_ordering_beyond_spread':better>spread and weaker < -spread,
