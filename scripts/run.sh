@@ -1,11 +1,5 @@
 #!/bin/bash
-# Compute job entry point.
-# Regenerates prediction artifacts from source, then evaluates them. Checkpoints
-# are gitignored, so this script must not rely on pre-existing local artifacts.
-
+# Compute job entry point (iteration 11 hardening bundle; see notes/hardening/job.sh).
 set -e
-
 cd "$(dirname "$0")/.."
-
-bash scripts/reproduce.sh
-python validate.py --compare
+bash notes/hardening/job.sh

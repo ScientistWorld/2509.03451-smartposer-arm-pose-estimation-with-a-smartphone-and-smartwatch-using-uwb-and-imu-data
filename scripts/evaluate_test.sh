@@ -1,15 +1,11 @@
 #!/bin/bash
-# Held-out evaluation slice for final method checks.
-# Reads the same prediction artifacts as the train slice and writes scoring/scores_test.json.
+# Held-out slice: every submission under checkpoints/ (all 10 fold models) is
+# run on held-out participants generated inside eval/test/ at test time. No
+# arguments needed. Writes scoring/scores_test.json.
 
 set -e
 
 cd "$(dirname "$0")/.."
 
 mkdir -p scoring
-
-if [ "$#" -eq 1 ] && [ -d "$1" ]; then
-  python eval/test/evaluate.py --predictions "$1/*/predictions.npz"
-else
-  python eval/test/evaluate.py "$@"
-fi
+python eval/test/evaluate.py "$@"

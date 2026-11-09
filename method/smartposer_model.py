@@ -1,4 +1,5 @@
-from __future__ import annotations
+# No `from __future__ import annotations`: these modules are compiled with TorchScript.
+from typing import Tuple
 
 import torch
 from torch import nn
@@ -7,10 +8,10 @@ from torch import nn
 class UWBCorrector(nn.Module):
     """Paper's UWB correction RNN: 2-layer BiLSTM, 8 hidden units/direction."""
 
-    def __init__(self, input_dim: int = 25) -> None:
+    def __init__(self, input_dim: int = 25, hidden: int = 8) -> None:
         super().__init__()
-        self.rnn = nn.LSTM(input_dim, 8, num_layers=2, batch_first=True, bidirectional=True)
-        self.out = nn.Linear(16, 1)
+        self.rnn = nn.LSTM(input_dim, hidden, num_layers=2, batch_first=True, bidirectional=True)
+        self.out = nn.Linear(2 * hidden, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y, _ = self.rnn(x)
@@ -20,10 +21,10 @@ class UWBCorrector(nn.Module):
 class PoseEstimator(nn.Module):
     """Paper's pose estimator RNN: 2-layer BiLSTM, 32 hidden units/direction."""
 
-    def __init__(self, input_dim: int = 25) -> None:
+    def __init__(self, input_dim: int = 25, hidden: int = 32) -> None:
         super().__init__()
-        self.rnn = nn.LSTM(input_dim, 32, num_layers=2, batch_first=True, bidirectional=True)
-        self.out = nn.Linear(64, 9)
+        self.rnn = nn.LSTM(input_dim, hidden, num_layers=2, batch_first=True, bidirectional=True)
+        self.out = nn.Linear(2 * hidden, 9)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y, _ = self.rnn(x)
@@ -31,32 +32,20 @@ class PoseEstimator(nn.Module):
 
 
 class SmartPoser(nn.Module):
-    """Two-stage SmartPoser: correct raw UWB range, then regress arm joints."""
+    """Two-stage SmartPoser: correct the raw UWB range, then regress arm joints
+    from the corrected range plus the IMU streams. Returns
+    (corrected range [B,125,1], joints [B,125,9]) for a 125-frame window."""
 
-    def __init__(self) -> None:
+    def __init__(self, pose_hidden: int = 32, corrector_hidden: int = 8) -> None:
         super().__init__()
-        self.uwb = UWBCorrector()
-        self.pose = PoseEstimator()
+        self.uwb = UWBCorrector(hidden=corrector_hidden)
+        self.pose = PoseEstimator(hidden=pose_hidden)
 
-    def forward(self, features: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         corrected = self.uwb(features)
-        pose_features = features.clone()
-        pose_features[..., :1] = corrected
-        joints = self.pose(pose_features)
+        pose_in = torch.cat([corrected, features[:, :, 1:]], dim=2)
+        joints = self.pose(pose_in)
         return corrected, joints
-
-
-class IMUOnlyPose(nn.Module):
-    """Ablation baseline: same pose estimator with the distance channel zeroed."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.pose = PoseEstimator()
-
-    def forward(self, features: torch.Tensor) -> torch.Tensor:
-        x = features.clone()
-        x[..., :1] = 0.0
-        return self.pose(x)
 
 
 def mpjpe(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:

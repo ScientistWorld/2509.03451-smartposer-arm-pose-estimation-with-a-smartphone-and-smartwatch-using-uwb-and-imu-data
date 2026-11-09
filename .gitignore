@@ -230,3 +230,8 @@ tmp/
 protocol.md
 *.egg-info
 core.[0-9]*
+
+# Iteration 11: tracked binary artifacts the gym needs on a fresh clone
+!data/smartposer_dev/*.npz
+!eval/train/fixed_models/*/*.pt
+!eval/test/fixed_models/*/*.pt

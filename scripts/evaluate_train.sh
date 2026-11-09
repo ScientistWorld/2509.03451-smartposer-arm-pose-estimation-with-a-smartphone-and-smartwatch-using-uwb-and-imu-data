@@ -1,15 +1,11 @@
 #!/bin/bash
-# Visible evaluation slice for future method-development iterations.
-# Reads pre-generated prediction artifacts and writes scoring/scores_train.json.
+# Visible slice: leave-one-participant-out scores on the 10 development
+# participants for every submission under checkpoints/. No arguments needed.
+# Writes scoring/scores_train.json.
 
 set -e
 
 cd "$(dirname "$0")/.."
 
 mkdir -p scoring
-
-if [ "$#" -eq 1 ] && [ -d "$1" ]; then
-  python eval/train/evaluate.py --predictions "$1/*/predictions.npz"
-else
-  python eval/train/evaluate.py "$@"
-fi
+python eval/train/evaluate.py "$@"

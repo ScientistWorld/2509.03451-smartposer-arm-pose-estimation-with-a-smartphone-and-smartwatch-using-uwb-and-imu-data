@@ -1,285 +1,358 @@
+"""Hidden-test evaluator for the phone/watch arm-tracking gym.
+
+The held-out participants are generated here, at test time, from a private
+seed; their sensor streams and ground truth never exist outside this process.
+Every submission under ``checkpoints/<method>/fold_<k>/model.pt`` (TorchScript,
+one model per leave-one-participant-out fold) is run on eval-built rolling
+windows of every held-out participant, and every scored number is computed
+here from the model outputs and the private ground truth. No number, flag,
+label, comparator or metadata file written by a submission is read.
+
+Gates (any failure scores the submission at the no-skill floor on every metric):
+  * all 10 fold models load as TorchScript, hold at most 92.8k parameters and
+    buffers (and at most the matching tensor storage), and return finite
+    ``(range [B,125,1], joints [B,125,9])`` for every window;
+  * pooled median elbow/wrist error beats the best constant pose (mean_pose);
+  * mean range error beats the raw UWB stream (raw_uwb).
+"""
+
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import re
+import sys
+import zipfile
 from pathlib import Path
 
 import numpy as np
+import torch
 
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import frozen_simulator as sim  # noqa: E402
 
 SLICE = "test"
+DEFAULT_CHECKPOINTS = Path("checkpoints")
 DEFAULT_OUT = Path("scoring/scores_test.json")
-DEFAULT_PATTERN = "checkpoints/*/predictions.npz"
-DEFAULT_TRAIN_SCORES = Path("scoring/scores_train.json")
-FOLD_PARITY = 1
-POSE_KEYS = {"pred_joints", "true_joints", "arm_span"}
-UWB_KEYS = {"features", "true_distance", "corrected_distance", "arm_span"}
+FINGERPRINT = HERE / "fingerprint.json"
+FIXED_DIR = HERE / "fixed_models"
+
+TEST_SEED = 0x6A1F_3C59_D2E8_47B1_9E04_5A7C_B3D1_28F6
+TEST_SUBJECTS = 16
+TEST_FRAMES = 3000
+WINDOW = 125
+TARGET_INDEX = 119  # 120th output frame: 5 frames (200 ms) of look-ahead
+LOOK_AHEAD = WINDOW - 1 - TARGET_INDEX
+STRIDE = 5
+MOTION_LAG = 25  # frames (1 s) for the high-motion slice
+N_FOLDS = 10
+BATCH = 512
+ORDER_SEED = 20251109
+PARAM_LIMIT = 92_800  # 2x the paper's 46.4k-parameter model
+STORAGE_LIMIT_BYTES = 8 * PARAM_LIMIT
+STORAGE_RE = re.compile(r"^[^/]+/(?:data|constants)/[^/]+$")
+
+POSE_EXP = "pose_tracking_synthetic"
+RANGE_EXP = "uwb_correction_synthetic"
+POSE_FLOOR = "mean_pose"
+RANGE_FLOOR = "raw_uwb"
+FIXED_POSE_BASELINES = ("imu_only",)
+RESERVED = {POSE_FLOOR, RANGE_FLOOR, *FIXED_POSE_BASELINES}
 
 
-def _paths_from_pattern(pattern: str) -> list[Path]:
-    paths = [Path(p) for p in glob.glob(pattern)]
-    literal = Path(pattern)
-    if literal.exists():
-        paths.append(literal)
-    return sorted(set(paths))
+class SubmissionError(Exception):
+    pass
 
 
-def _collect_prediction_paths(args: argparse.Namespace) -> list[Path]:
-    patterns: list[str] = []
-    if args.smartposer:
-        patterns.append(args.smartposer)
-    if args.imu_only:
-        patterns.append(args.imu_only)
-    if args.predictions:
-        patterns.extend(args.predictions)
-    if not patterns:
-        patterns.append(DEFAULT_PATTERN)
-
-    paths: list[Path] = []
-    for pattern in patterns:
-        paths.extend(_paths_from_pattern(pattern))
-    paths = sorted(set(paths))
-    if not paths and not args.allow_partial:
-        raise FileNotFoundError(f"No prediction artifacts matched: {patterns}")
-    return paths
+# ── Hidden participants ─────────────────────────────────────────────────────
 
 
-def _metadata(path: Path) -> dict:
-    metadata_path = path.parent / "metadata.json"
-    if not metadata_path.exists():
-        return {}
-    return json.loads(metadata_path.read_text())
+def _fingerprint(subjects: list[dict]) -> list[list[float]]:
+    return [
+        [
+            float(s["arm_span"]),
+            float(np.mean(s["joints"], dtype=np.float64)),
+            float(np.std(s["joints"], dtype=np.float64)),
+            float(np.mean(s["true_distance"], dtype=np.float64)),
+            float(np.mean(s["features"][:, 0], dtype=np.float64)),
+            float(np.mean(s["features"][:, 22:25], dtype=np.float64)),
+        ]
+        for s in subjects
+    ]
 
 
-def _method_name(path: Path) -> str:
-    metadata = _metadata(path)
-    method = metadata.get("method")
-    if isinstance(method, str) and method:
-        return method
-    return re.sub(r"[_-]?fold[_-]?\d+$", "", path.parent.name)
+def _check_fingerprint(subjects: list[dict]) -> None:
+    current = _fingerprint(subjects)
+    if not FINGERPRINT.exists():
+        FINGERPRINT.write_text(json.dumps({"simulator": sim.SIMULATOR_VERSION, "subjects": current}, indent=2) + "\n")
+        return
+    stored = json.loads(FINGERPRINT.read_text())
+    if stored.get("simulator") != sim.SIMULATOR_VERSION or not np.allclose(
+        np.asarray(stored["subjects"]), np.asarray(current), rtol=0.0, atol=1e-5
+    ):
+        raise RuntimeError(
+            "Hidden test participants do not match eval/test/fingerprint.json; the numeric "
+            "environment changed, so scores would not be comparable with the stored reference."
+        )
 
 
-def _group_by_method(paths: list[Path]) -> dict[str, list[Path]]:
-    grouped: dict[str, list[Path]] = {}
-    for path in paths:
-        grouped.setdefault(_method_name(path), []).append(path)
-    return {method: sorted(method_paths) for method, method_paths in sorted(grouped.items())}
+def build_test_set() -> dict[str, np.ndarray]:
+    subjects = sim.make_participants(TEST_SEED, TEST_SUBJECTS, TEST_FRAMES)
+    _check_fingerprint(subjects)
+    xs, joints, dist, raw, span, motion = [], [], [], [], [], []
+    for s in subjects:
+        feats = np.ascontiguousarray(s["features"], dtype=np.float32)
+        frames = feats.shape[0]
+        targets = np.arange(TARGET_INDEX, frames - LOOK_AHEAD, STRIDE)
+        view = np.lib.stride_tricks.sliding_window_view(feats, WINDOW, axis=0)
+        xs.append(np.ascontiguousarray(view[targets - TARGET_INDEX].transpose(0, 2, 1)))
+        j = s["joints"].astype(np.float64)
+        a = float(s["arm_span"])
+        joints.append(j[targets])
+        dist.append(s["true_distance"][targets, 0].astype(np.float64))
+        raw.append(feats[targets, 0].astype(np.float64))
+        span.append(np.full(targets.size, a))
+        motion.append(np.linalg.norm(j[targets, 6:9] - j[targets - MOTION_LAG, 6:9], axis=1) * a)
+    data = {
+        "X": np.concatenate(xs).astype(np.float32),
+        "joints": np.concatenate(joints),
+        "dist": np.concatenate(dist),
+        "raw": np.concatenate(raw),
+        "span": np.concatenate(span),
+        "motion": np.concatenate(motion),
+    }
+    data["high_motion"] = data["motion"] >= np.quantile(data["motion"], 0.75)
+    raw_err = np.abs(data["raw"] - data["dist"]) * data["span"]
+    data["hard_range"] = raw_err >= np.quantile(raw_err, 0.75)
+    return data
 
 
-def _fold_index(path: Path) -> int | None:
-    match = re.search(r"[_-]fold[_-]?(\d+)$", path.parent.name)
-    if match:
-        return int(match.group(1))
-    return None
+# ── Metrics ─────────────────────────────────────────────────────────────────
 
 
-def _select_slice_paths(paths: list[Path]) -> tuple[list[Path], bool]:
-    fold_paths = [(path, _fold_index(path)) for path in paths]
-    if any(fold is None for _, fold in fold_paths):
-        return paths, False
-
-    selected = [path for path, fold in fold_paths if fold % 2 == FOLD_PARITY]
-    if selected and len(selected) < len(paths):
-        return selected, True
-    return paths, False
-
-
-def _metadata_param_count_k(paths: list[Path]) -> float:
-    counts = []
-    for path in paths:
-        metadata_path = path.parent / "metadata.json"
-        if not metadata_path.exists():
-            raise FileNotFoundError(f"Missing required metadata file: {metadata_path}")
-        metadata = json.loads(metadata_path.read_text())
-        if "param_count_k" not in metadata:
-            raise KeyError(f"metadata file {metadata_path} does not contain param_count_k")
-        counts.append(float(metadata["param_count_k"]))
-    return float(max(counts))
-
-
-def _slice_mask(n: int, block_size: int) -> np.ndarray:
-    if n <= 1:
-        return np.zeros(n, dtype=bool)
-    idx = np.arange(n)
-    mask = ((idx // block_size) % 2) == 1
-    if mask.sum() == 0 or mask.sum() == n:
-        midpoint = n // 2
-        mask = idx >= midpoint
-    return mask
-
-
-def _load_concat(paths: list[Path], required_keys: set[str], block_size: int, use_full_artifact: bool) -> dict[str, np.ndarray]:
-    if not paths:
-        raise FileNotFoundError("No prediction artifacts were provided")
-    arrays = {key: [] for key in sorted(required_keys)}
-    for path in paths:
-        with np.load(path) as data:
-            missing = required_keys - set(data.files)
-            if missing:
-                raise KeyError(f"{path} is missing required keys for {SLICE} scoring: {sorted(missing)}")
-            first_key = next(iter(required_keys))
-            if use_full_artifact:
-                mask = np.ones(int(data[first_key].shape[0]), dtype=bool)
-            else:
-                mask = _slice_mask(int(data[first_key].shape[0]), block_size)
-            for key in arrays:
-                arrays[key].append(data[key][mask])
-    return {key: np.concatenate(chunks, axis=0) for key, chunks in arrays.items()}
-
-
-def _all_paths_have_keys(paths: list[Path], required_keys: set[str]) -> bool:
-    for path in paths:
-        with np.load(path) as data:
-            if required_keys - set(data.files):
-                return False
-    return True
-
-
-def joint_errors_cm(pred: np.ndarray, true: np.ndarray, arm_span: np.ndarray) -> np.ndarray:
-    pred_j = pred.reshape(*pred.shape[:-1], 3, 3)
-    true_j = true.reshape(*true.shape[:-1], 3, 3)
-    span = arm_span[..., None]
-    return np.linalg.norm((pred_j - true_j) * span, axis=-1) * 100.0
-
-
-def _elbow_wrist_errors_at_target(d: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    errors = joint_errors_cm(d["pred_joints"], d["true_joints"], d["arm_span"])
-    target = errors[:, 119, :]
-    elbow = target[:, 1]
-    wrist = target[:, 2]
-    return elbow, wrist, np.concatenate([elbow, wrist])
-
-
-def bone_length_mae_cm(pred: np.ndarray, true: np.ndarray, arm_span: np.ndarray) -> float:
-    pred_j = pred.reshape(*pred.shape[:-1], 3, 3)
-    true_j = true.reshape(*true.shape[:-1], 3, 3)
-    pred_len = np.linalg.norm(pred_j[:, 119, 2] - pred_j[:, 119, 1], axis=-1)
-    true_len = np.linalg.norm(true_j[:, 119, 2] - true_j[:, 119, 1], axis=-1)
-    span = arm_span[:, 119, 0]
-    return float(np.mean(np.abs(pred_len - true_len) * span * 100.0))
-
-
-def high_motion_mean_cm(d: dict[str, np.ndarray], both_errors: np.ndarray) -> float:
-    true_j = d["true_joints"].reshape(*d["true_joints"].shape[:-1], 3, 3)
-    wrist = true_j[:, :, 2, :]
-    motion = np.linalg.norm(wrist[:, 119, :] - wrist[:, 94, :], axis=-1) * d["arm_span"][:, 119, 0]
-    if motion.size == 0:
-        return float("nan")
-    threshold = np.quantile(motion, 0.75)
-    mask = motion >= threshold
-    sample_errors = both_errors.reshape(2, -1).T
-    return float(np.mean(sample_errors[mask]))
-
-
-def summarize_pose(paths: list[Path], block_size: int, use_full_artifact: bool) -> dict[str, float]:
-    d = _load_concat(paths, POSE_KEYS, block_size, use_full_artifact)
-    elbow, wrist, both = _elbow_wrist_errors_at_target(d)
+def pose_metrics(pred: np.ndarray, true: np.ndarray, span: np.ndarray, high_motion: np.ndarray) -> dict[str, float]:
+    err = np.linalg.norm((pred - true).reshape(-1, 3, 3), axis=-1) * span[:, None] * 100.0
+    elbow, wrist = err[:, 1], err[:, 2]
+    both = np.concatenate([elbow, wrist])
+    per_frame = 0.5 * (elbow + wrist)
     return {
         "median_elbow_cm": float(np.median(elbow)),
         "median_wrist_cm": float(np.median(wrist)),
         "median_elbow_wrist_cm": float(np.median(both)),
         "mean_elbow_wrist_cm": float(np.mean(both)),
         "p90_elbow_wrist_cm": float(np.percentile(both, 90)),
-        "high_motion_mean_elbow_wrist_cm": high_motion_mean_cm(d, both),
-        "forearm_length_mae_cm": bone_length_mae_cm(d["pred_joints"], d["true_joints"], d["arm_span"]),
-        "param_count_k": _metadata_param_count_k(paths),
+        "high_motion_mean_elbow_wrist_cm": float(np.mean(per_frame[high_motion])),
     }
 
 
-def summarize_uwb(paths: list[Path], block_size: int, use_full_artifact: bool) -> dict[str, float]:
-    d = _load_concat(paths, UWB_KEYS, block_size, use_full_artifact)
-    span = d["arm_span"][..., 0]
-    true = d["true_distance"][..., 0]
-    raw = d["features"][..., 0]
-    corrected = d["corrected_distance"][..., 0]
+def range_metrics(pred: np.ndarray, true: np.ndarray, raw: np.ndarray, span: np.ndarray, hard: np.ndarray) -> dict[str, float]:
+    corrected_err = np.abs(pred - true) * span * 100.0
     raw_err = np.abs(raw - true) * span * 100.0
-    corr_err = np.abs(corrected - true) * span * 100.0
-    hard_mask = raw_err >= np.quantile(raw_err, 0.75)
     return {
-        "raw_uwb_mae_cm": float(np.mean(raw_err)),
-        "corrected_uwb_mae_cm": float(np.mean(corr_err)),
-        "corrected_uwb_p90_cm": float(np.percentile(corr_err, 90)),
-        "uwb_improvement_cm": float(np.mean(raw_err) - np.mean(corr_err)),
-        "hard_uwb_improvement_cm": float(np.mean(raw_err[hard_mask]) - np.mean(corr_err[hard_mask])),
-        "uwb_correction_win_rate": float(np.mean(corr_err < raw_err)),
+        "corrected_uwb_mae_cm": float(np.mean(corrected_err)),
+        "corrected_uwb_p90_cm": float(np.percentile(corrected_err, 90)),
+        "occluded_uwb_mae_cm": float(np.mean(corrected_err[hard])),
+        "uwb_correction_win_rate": float(np.mean(corrected_err < raw_err)),
     }
 
 
-def build_scores(paths: list[Path], block_size: int) -> dict:
-    scores = {"slice": SLICE, "experiments": {}}
-    grouped = _group_by_method(paths)
-
-    pose_results = {}
-    uwb_results = {}
-    for method, method_paths in grouped.items():
-        slice_paths, use_full_artifact = _select_slice_paths(method_paths)
-        if _all_paths_have_keys(slice_paths, POSE_KEYS):
-            pose_results[method] = summarize_pose(slice_paths, block_size, use_full_artifact)
-        if _all_paths_have_keys(slice_paths, UWB_KEYS):
-            uwb_results[method] = summarize_uwb(slice_paths, block_size, use_full_artifact)
-
-    if pose_results:
-        scores["experiments"]["pose_tracking_synthetic"] = {"results": pose_results}
-    if uwb_results:
-        scores["experiments"]["uwb_correction_synthetic"] = {"results": uwb_results}
-    return scores
+# ── Running submissions ─────────────────────────────────────────────────────
 
 
-def _expected_methods(train_scores_path: Path) -> dict[str, set[str]] | None:
-    if not train_scores_path.exists():
-        return None
-    data = json.loads(train_scores_path.read_text())
-    expected: dict[str, set[str]] = {}
-    for exp_name, exp_data in data.get("experiments", {}).items():
-        methods = set(exp_data.get("results", {}).keys())
-        if methods:
-            expected[exp_name] = methods
-    return expected
+def inspect_model(path: Path) -> tuple[int, int]:
+    if not path.is_file():
+        raise SubmissionError(f"missing {path}")
+    try:
+        with zipfile.ZipFile(path) as zf:
+            storage = sum(info.file_size for info in zf.infolist() if STORAGE_RE.match(info.filename))
+    except zipfile.BadZipFile as exc:
+        raise SubmissionError(f"{path} is not a TorchScript archive") from exc
+    module = torch.jit.load(str(path), map_location="cpu")
+    seen: set[tuple[int, int]] = set()
+    count = 0
+    for tensor in list(module.parameters()) + list(module.buffers()):
+        key = (tensor.data_ptr(), tensor.numel())
+        if key in seen:
+            continue
+        seen.add(key)
+        count += int(tensor.numel())
+    return count, int(storage)
 
 
-def _filter_to_train_methods(scores: dict, expected: dict[str, set[str]] | None) -> dict:
-    if expected is None:
-        return scores
+def _check_output(out, batch: int) -> tuple[np.ndarray, np.ndarray]:
+    if not isinstance(out, (tuple, list)) or len(out) != 2:
+        raise SubmissionError("forward must return a (range, joints) pair")
+    rng_t, joints_t = out
+    if not isinstance(rng_t, torch.Tensor) or not isinstance(joints_t, torch.Tensor):
+        raise SubmissionError("forward outputs must be tensors")
+    if tuple(rng_t.shape) != (batch, WINDOW, 1) or tuple(joints_t.shape) != (batch, WINDOW, 9):
+        raise SubmissionError(
+            f"output shapes {tuple(rng_t.shape)} / {tuple(joints_t.shape)}; expected ({batch}, {WINDOW}, 1) / ({batch}, {WINDOW}, 9)"
+        )
+    r = rng_t[:, TARGET_INDEX, 0].detach().double().cpu().numpy()
+    j = joints_t[:, TARGET_INDEX, :].detach().double().cpu().numpy()
+    if not (np.all(np.isfinite(r)) and np.all(np.isfinite(j))):
+        raise SubmissionError("non-finite outputs")
+    return r, j
 
-    filtered = {"slice": SLICE, "experiments": {}}
-    for exp_name, methods in sorted(expected.items()):
-        available = scores.get("experiments", {}).get(exp_name, {}).get("results", {})
-        missing = methods - set(available.keys())
-        if missing:
-            raise KeyError(
-                f"Test slice could not score every method from train scores for "
-                f"{exp_name}: missing {sorted(missing)}"
-            )
-        filtered["experiments"][exp_name] = {
-            "results": {method: available[method] for method in sorted(methods)}
-        }
-    return filtered
+
+def run_model(path: Path, X: np.ndarray, device: torch.device, order: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    n = X.shape[0]
+    range_out = np.empty(n)
+    pose_out = np.empty((n, 9))
+    for start in range(0, n, BATCH):
+        idx = order[start : start + BATCH]
+        # Fresh module per batch, windows shuffled across participants and time:
+        # no state or batch statistics can carry information between windows.
+        module = torch.jit.load(str(path), map_location=device)
+        module.eval()
+        with torch.inference_mode():
+            out = module(torch.from_numpy(X[idx]).to(device))
+        r, j = _check_output(out, len(idx))
+        range_out[idx] = r
+        pose_out[idx] = j
+    return range_out, pose_out
+
+
+def evaluate_submission(fold_paths: dict[int, Path], data: dict, device: torch.device, order: np.ndarray) -> dict:
+    status: dict = {"valid": True, "reasons": [], "param_count": None, "storage_bytes": None}
+    ranges, poses = [], []
+    counts, storages = [], []
+    for k in range(N_FOLDS):
+        path = fold_paths.get(k)
+        try:
+            if path is None:
+                raise SubmissionError("missing fold model")
+            count, storage = inspect_model(path)
+            counts.append(count)
+            storages.append(storage)
+            if count > PARAM_LIMIT:
+                raise SubmissionError(f"{count} parameters+buffers exceed the {PARAM_LIMIT} limit")
+            if storage > STORAGE_LIMIT_BYTES:
+                raise SubmissionError(f"{storage} bytes of stored tensors exceed the {STORAGE_LIMIT_BYTES}-byte limit")
+            r, j = run_model(path, data["X"], device, order)
+        except Exception as exc:  # any failure invalidates the whole submission
+            status["valid"] = False
+            status["reasons"].append(f"fold {k}: {type(exc).__name__}: {exc}"[:500])
+            break
+        ranges.append(r)
+        poses.append(j)
+    if counts:
+        status["param_count"] = int(max(counts))
+        status["storage_bytes"] = int(max(storages))
+    if not status["valid"]:
+        return status
+    reps = len(poses)
+    status["pose"] = pose_metrics(
+        np.concatenate(poses), np.tile(data["joints"], (reps, 1)), np.tile(data["span"], reps), np.tile(data["high_motion"], reps)
+    )
+    status["range"] = range_metrics(
+        np.concatenate(ranges),
+        np.tile(data["dist"], reps),
+        np.tile(data["raw"], reps),
+        np.tile(data["span"], reps),
+        np.tile(data["hard_range"], reps),
+    )
+    return status
+
+
+def discover(checkpoints: Path) -> tuple[dict[str, dict[int, Path]], list[str]]:
+    submissions: dict[str, dict[int, Path]] = {}
+    skipped: list[str] = []
+    if not checkpoints.is_dir():
+        return submissions, skipped
+    for d in sorted(p for p in checkpoints.iterdir() if p.is_dir()):
+        fold_dirs = [p for p in d.glob("fold_*") if p.is_dir()]
+        if not fold_dirs:
+            skipped.append(f"{d.name}: no fold_<k>/model.pt submission layout")
+            continue
+        if d.name in RESERVED or d.name.startswith("_"):
+            skipped.append(f"{d.name}: reserved name (fixed by eval/)")
+            continue
+        submissions[d.name] = {k: d / f"fold_{k}" / "model.pt" for k in range(N_FOLDS) if (d / f"fold_{k}" / "model.pt").exists()}
+    return submissions, skipped
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--predictions", action="append", help="Prediction artifact glob; may be supplied multiple times.")
-    ap.add_argument("--smartposer", default=None, help="Legacy SmartPoser prediction glob.")
-    ap.add_argument("--imu-only", dest="imu_only", default=None, help="Legacy IMU-only prediction glob.")
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--checkpoints-dir", type=Path, default=DEFAULT_CHECKPOINTS)
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    ap.add_argument("--train-scores", type=Path, default=DEFAULT_TRAIN_SCORES)
-    ap.add_argument("--block-size", type=int, default=64, help="Temporal block size for the deterministic held-out slice.")
-    ap.add_argument("--allow-partial", action="store_true", help="Write scores for whichever artifacts exist.")
+    ap.add_argument("--device", default=None)
     args = ap.parse_args()
+    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
 
-    if args.block_size < 1:
-        raise ValueError("--block-size must be positive")
-    paths = _collect_prediction_paths(args)
-    scores = build_scores(paths, args.block_size)
-    scores = _filter_to_train_methods(scores, _expected_methods(args.train_scores))
-    if not scores["experiments"] and not args.allow_partial:
-        raise RuntimeError("No scoreable prediction artifacts were found")
+    data = build_test_set()
+    order = np.random.default_rng(ORDER_SEED).permutation(data["X"].shape[0])
 
+    floor_pose = pose_metrics(
+        np.broadcast_to(data["joints"].mean(axis=0), data["joints"].shape), data["joints"], data["span"], data["high_motion"]
+    )
+    floor_pose["param_count_k"] = 0.009
+    floor_range = range_metrics(data["raw"], data["dist"], data["raw"], data["span"], data["hard_range"])
+
+    pose_results = {POSE_FLOOR: dict(floor_pose)}
+    range_results = {RANGE_FLOOR: dict(floor_range)}
+    statuses: dict[str, dict] = {}
+    skipped: list[str] = []
+
+    for name in FIXED_POSE_BASELINES:
+        fold_paths = {k: FIXED_DIR / name / f"fold_{k}.pt" for k in range(N_FOLDS)}
+        if not all(p.exists() for p in fold_paths.values()):
+            skipped.append(f"{name}: fixed baseline models not installed under {FIXED_DIR / name}")
+            continue
+        st = evaluate_submission(fold_paths, data, device, order)
+        st.pop("range", None)
+        if st["valid"] and st["pose"]["median_elbow_wrist_cm"] >= floor_pose["median_elbow_wrist_cm"]:
+            st["valid"] = False
+            st["reasons"].append("pose error not below the constant-pose floor")
+        row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
+        row["param_count_k"] = (st["param_count"] or 0) / 1000.0
+        pose_results[name] = row
+        statuses[name] = st
+
+    submissions, found_skipped = discover(args.checkpoints_dir)
+    skipped.extend(found_skipped)
+    for name, fold_paths in submissions.items():
+        st = evaluate_submission(fold_paths, data, device, order)
+        if st["valid"]:
+            if st["pose"]["median_elbow_wrist_cm"] >= floor_pose["median_elbow_wrist_cm"]:
+                st["valid"] = False
+                st["reasons"].append("pose error not below the constant-pose floor (mean_pose)")
+            if st["range"]["corrected_uwb_mae_cm"] >= floor_range["corrected_uwb_mae_cm"]:
+                st["valid"] = False
+                st["reasons"].append("range error not below the raw UWB stream (raw_uwb)")
+        pose_row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
+        pose_row["param_count_k"] = (st["param_count"] or 0) / 1000.0
+        pose_results[name] = pose_row
+        range_results[name] = dict(st["range"]) if st["valid"] else dict(floor_range)
+        statuses[name] = st
+        print(json.dumps({"method": name, "valid": st["valid"], "reasons": st["reasons"]}), flush=True)
+
+    scores = {
+        "slice": SLICE,
+        "experiments": {
+            POSE_EXP: {"results": {k: pose_results[k] for k in sorted(pose_results)}},
+            RANGE_EXP: {"results": {k: range_results[k] for k in sorted(range_results)}},
+        },
+        "_status": statuses,
+        "_meta": {
+            "simulator": sim.SIMULATOR_VERSION,
+            "participants": TEST_SUBJECTS,
+            "frames_per_participant": TEST_FRAMES,
+            "windows_per_fold_model": int(data["X"].shape[0]),
+            "folds": N_FOLDS,
+            "target_index": TARGET_INDEX,
+            "stride": STRIDE,
+            "param_limit": PARAM_LIMIT,
+            "storage_limit_bytes": STORAGE_LIMIT_BYTES,
+            "device": str(device),
+            "skipped": skipped,
+        },
+    }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(scores, indent=2) + "\n")
-    print(json.dumps(scores, indent=2))
+    print(json.dumps(scores["experiments"], indent=2))
 
 
 if __name__ == "__main__":

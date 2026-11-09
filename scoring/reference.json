@@ -1,26 +1,50 @@
 {
+  "_note": "Results blocks hold the paper's reported real-data numbers (UIST'23, 10 participants, leave-one-participant-out). The gym runs on a simulated substitute (the paper's data release is unreachable), so reproduced values are on the substitute's scale and are not targets to match. Ranking compares submissions with the stored reference run in scoring/scores_test.json. Coefficients are magnitudes; the better direction is higher_is_better. param_count_k is a hard gate (<= 92.8k parameters+buffers per fold model, i.e. 2x the paper's 46.4k) rather than a scored term, hence coefficient 0. A submission that fails a gate (load/run/shape/finite/size, pose not better than the best constant pose, range not better than the raw stream) is scored at the mean_pose / raw_uwb floor on every metric.",
+  "_paper_reported": {
+    "smartposer": {
+      "median_elbow_cm": 8.7,
+      "median_wrist_cm": 13.3,
+      "median_elbow_wrist_cm": 11.0,
+      "mean_per_joint_position_error_elbow_wrist_cm": 12.6,
+      "mean_absolute_error_elbow_wrist_cm": 18.7,
+      "param_count_k": 46.4,
+      "uwb_correction_param_count_k": 3.0,
+      "pose_estimator_param_count_k": 43.4,
+      "raw_uwb_mae_cm": 21.0,
+      "corrected_uwb_mae_cm": 8.6,
+      "uwb_improvement_cm": 12.4,
+      "corrected_vs_true_distance_r2": 0.72,
+      "gross_motor_median_elbow_wrist_cm": 11.2,
+      "daily_activities_median_elbow_wrist_cm": 11.1
+    },
+    "imu_only": {
+      "median_elbow_cm": 11.7,
+      "median_wrist_cm": 16.7,
+      "median_elbow_wrist_cm": 14.2
+    },
+    "transcription_fix": "Iteration 11 removed mean_elbow_wrist_cm=18.7 from the imu_only row: 18.7 is SmartPoser's mean absolute error (paper Table 1), not an IMU-only result."
+  },
   "experiments": {
     "pose_tracking_synthetic": {
-      "description": "Arm pose tracking with 10-fold leave-one-synthetic-subject-out substitute data; lower joint-position error indicates better wearable pose estimation.",
+      "description": "Held-out-participant arm pose tracking from phone/watch range + inertial streams at a fixed 200 ms look-ahead; every fold model is run on eval-generated rolling windows of unseen participants.",
       "weight": 0.7,
       "primary_metric": "median_elbow_wrist_cm",
       "metrics": {
-        "median_elbow_cm": {"higher_is_better": false, "coefficient": -0.5, "description": "Median 3-D elbow position error at the target output frame."},
-        "median_wrist_cm": {"higher_is_better": false, "coefficient": -0.5, "description": "Median 3-D wrist position error at the target output frame."},
-        "median_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -1.0, "description": "Headline central pose error over elbow and wrist predictions."},
-        "mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Average elbow/wrist position error, adding sensitivity to broad degradation hidden by medians."},
-        "p90_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.45, "description": "Ninetieth-percentile elbow/wrist error to catch methods that only optimize typical poses."},
-        "high_motion_mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Mean elbow/wrist error on the highest-motion quartile of windows."},
-        "forearm_length_mae_cm": {"higher_is_better": false, "coefficient": -0.25, "description": "Predicted forearm-length error, penalizing geometrically implausible pose shortcuts."},
-        "param_count_k": {"higher_is_better": false, "coefficient": -0.2, "description": "Trainable parameter count in thousands, preserving the small-model constraint."}
+        "median_elbow_cm": {"higher_is_better": false, "coefficient": 0.5, "description": "Median 3-D elbow position error at the scored output frame (paper Table 1)."},
+        "median_wrist_cm": {"higher_is_better": false, "coefficient": 0.5, "description": "Median 3-D wrist position error at the scored output frame (paper Table 1)."},
+        "median_elbow_wrist_cm": {"higher_is_better": false, "coefficient": 1.0, "description": "Headline median error over elbow and wrist predictions (paper's primary metric)."},
+        "mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": 0.35, "description": "Mean per-joint position error over elbow and wrist (paper Table 1 MPJPE)."},
+        "p90_elbow_wrist_cm": {"higher_is_better": false, "coefficient": 0.45, "description": "90th-percentile elbow/wrist error (tail of the paper's error CDF)."},
+        "high_motion_mean_elbow_wrist_cm": {"higher_is_better": false, "coefficient": 0.35, "description": "Mean elbow/wrist error on the quartile of frames with the largest true 1-s wrist displacement."},
+        "param_count_k": {"higher_is_better": false, "coefficient": 0.0, "description": "Largest fold model's parameter+buffer count in thousands, measured from the TorchScript file. Reported only; enforced as a hard gate at 92.8k."}
       },
       "results": {
+        "mean_pose": {"type": "baseline"},
         "imu_only": {
           "type": "baseline",
           "median_elbow_cm": 11.7,
           "median_wrist_cm": 16.7,
           "median_elbow_wrist_cm": 14.2,
-          "mean_elbow_wrist_cm": 18.7,
           "param_count_k": 43.4
         },
         "smartposer": {
@@ -34,24 +58,18 @@
       }
     },
     "uwb_correction_synthetic": {
-      "description": "UWB correction quality; better methods reduce noisy phone-watch range error without only improving easy samples.",
+      "description": "Accuracy of the submitted phone-watch range stream against the true distance, compared with the raw UWB stream that the evaluator reads from its own inputs.",
       "weight": 0.3,
       "primary_metric": "corrected_uwb_mae_cm",
       "metrics": {
-        "raw_uwb_mae_cm": {"higher_is_better": false, "coefficient": 0.0, "description": "Mean raw range error before correction, reported only as context for correction difficulty."},
-        "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": -1.0, "description": "Headline mean absolute error after range correction."},
-        "corrected_uwb_p90_cm": {"higher_is_better": false, "coefficient": -0.35, "description": "Ninetieth-percentile corrected range error, detecting brittle correction on difficult samples."},
-        "uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.55, "description": "Mean error reduction from raw to corrected range."},
-        "hard_uwb_improvement_cm": {"higher_is_better": true, "coefficient": 0.35, "description": "Error reduction on the highest raw-error quartile, targeting occlusion-like range failures."},
-        "uwb_correction_win_rate": {"higher_is_better": true, "coefficient": 0.25, "description": "Fraction of evaluated windows where correction improves over the raw range."}
+        "corrected_uwb_mae_cm": {"higher_is_better": false, "coefficient": 1.0, "description": "Mean absolute error of the submitted range stream (paper Fig. 7; for raw_uwb this is the raw-stream error)."},
+        "corrected_uwb_p90_cm": {"higher_is_better": false, "coefficient": 0.35, "description": "90th-percentile absolute range error."},
+        "occluded_uwb_mae_cm": {"higher_is_better": false, "coefficient": 0.35, "description": "Mean absolute range error on the quartile of frames where the raw stream is worst (occlusion-like failures, paper Fig. 9)."},
+        "uwb_correction_win_rate": {"higher_is_better": true, "coefficient": 0.25, "description": "Fraction of scored frames where the submitted range is closer to the truth than the raw stream."}
       },
       "results": {
-        "smartposer": {
-          "type": "proposed",
-          "raw_uwb_mae_cm": 21.0,
-          "corrected_uwb_mae_cm": 8.6,
-          "uwb_improvement_cm": 12.4
-        }
+        "raw_uwb": {"type": "baseline", "corrected_uwb_mae_cm": 21.0},
+        "smartposer": {"type": "proposed", "corrected_uwb_mae_cm": 8.6}
       }
     }
   }

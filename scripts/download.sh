@@ -1,31 +1,40 @@
 #!/bin/bash
-# Download all data and models needed for this environment.
+# Fetch / verify all data and models needed for this environment.
 #
-# Run on a node with internet access BEFORE building the container
-# or submitting compute jobs.
+# Idempotent; safe to run repeatedly.
 #
-# This script should be idempotent — safe to run multiple times.
-# It should skip files that already exist.
+# Estimated total download size: 0 GB (nothing is fetched from the network).
+# Estimated disk usage: ~15 MB (development participants tracked in git).
 #
-# Update the storage estimate below as you add downloads.
-#
-# Estimated total download size: 0 GB
-# Estimated disk usage after generation: <50 MB
-#
-# This paper's public release URL is unavailable, so no external files are
-# fetched. The substitute benchmark data is generated into workspace-local
-# paths so a fresh clone can recreate it without any pre-placed cache.
+# The paper's public release (https://github.com/FIGLAB/SmartPoser) is not
+# reachable, so this benchmark uses a simulated substitute for the
+# synchronized UWB/IMU/Kinect recordings. The 10 visible development
+# participants are versioned in git under data/smartposer_dev/ (written once
+# by the simulator with public seed 7). The simulator itself is private to the
+# hidden test, so it can neither mint extra training participants nor
+# regenerate the held-out ones. No pretrained weights are used.
 
 set -e
 
 cd "$(dirname "$0")/.."
 
-if [ ! -e data/smartposer_synthetic/train_windows.npz ] || [ ! -e data/smartposer_synthetic/test_windows.npz ]; then
-  python data/synthetic_smartposer.py --out data/smartposer_synthetic --subjects 10 --frames 1000 --seed 7 --profile combined
+DEV=data/smartposer_dev
+complete=1
+[ -f "$DEV/SHA256SUMS" ] || complete=0
+for k in 00 01 02 03 04 05 06 07 08 09; do
+  [ -f "$DEV/subject_${k}.npz" ] || complete=0
+done
+
+if [ "$complete" = 0 ]; then
+  if [ -f eval/test/frozen_simulator.py ]; then
+    python eval/test/frozen_simulator.py --write-dev "$DEV"
+  else
+    git checkout -- "$DEV" 2>/dev/null || {
+      echo "data/smartposer_dev is tracked in git; restore it with: git checkout -- $DEV" >&2
+      exit 1
+    }
+  fi
 fi
 
-for fold in $(seq 0 9); do
-  if [ ! -e "data/smartposer_synthetic_fold_${fold}/train_windows.npz" ] || [ ! -e "data/smartposer_synthetic_fold_${fold}/test_windows.npz" ]; then
-    python data/synthetic_smartposer.py --out "data/smartposer_synthetic_fold_${fold}" --subjects 10 --frames 1000 --seed 7 --test-subject "${fold}" --profile combined
-  fi
-done
+(cd "$DEV" && sha256sum --check --quiet SHA256SUMS)
+echo "development participants OK: $DEV"
