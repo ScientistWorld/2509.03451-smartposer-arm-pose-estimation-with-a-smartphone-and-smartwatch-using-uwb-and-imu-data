@@ -1,5 +1,9 @@
 # Progress
 
+## Current state (final hardening, 2026-11-09)
+
+The gym's current design, results and audit are in `HARDENING.md`, `briefing/evaluation.md` and `scoring/`. Earlier entries below describe superseded designs: prediction-file artifacts and the `data/synthetic_smartposer.py` generator.
+
 ## What Works
 
 - Paper analysis is complete for the core SmartPoser claims and reported metrics.

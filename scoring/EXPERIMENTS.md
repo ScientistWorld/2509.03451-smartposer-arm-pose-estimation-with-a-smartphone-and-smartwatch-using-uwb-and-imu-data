@@ -5,7 +5,9 @@ Both experiments are scored on the hidden slice: 48 unseen participants generate
 ## pose_tracking_synthetic (weight 0.7)
 Can 3-D elbow and wrist position be recovered for a person the system has never seen, from phone and watch sensors alone, at a fixed 200 ms latency? The primary metric is the median elbow/wrist error in cm. Supporting metrics look at each joint separately, at the mean and the 90th-percentile error (failure tails), and at the quarter of frames with the fastest wrist motion. The constant mean pose is the no-skill floor. The frozen inertial-only models show how much the absolute range measurement adds to pose tracking. A submission must stay within twice the paper's model size; this is a hard gate, not a score.
 
-Reference (hidden slice): see `scoring/scores_test.json`. The method improves clearly on the inertial-only comparison and is far below the constant-pose floor.
+Reference (hidden slice, `scoring/scores_test.json`): 7.79 cm median elbow/wrist error, against 9.27 cm for the inertial-only comparison and 22.92 cm for the constant pose. Seed-to-seed spread of the reference is about 0.1 cm. None of the error metrics is near zero, so better trackers have room to score higher.
 
 ## uwb_correction_synthetic (weight 0.3)
 Is the noisy, occlusion-biased phone-watch range made more accurate than the raw stream? The primary metric is the percentage of the raw stream's mean absolute range error that is removed. Supporting metrics: the 90th-percentile range error, the error on the quarter of frames where the raw stream is worst (occlusion), and the fraction of frames improved over the raw stream. The raw stream is the floor. A submission whose range output is not better than the raw stream fails the run.
+
+Reference (hidden slice): 68.3% of the raw stream's 13.37 cm mean error removed (4.24 cm), with 75% of frames improved. The bound is 100%.

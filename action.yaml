@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 1
-test: false
+action: done
 milestone: core_claim
-notes: "Final hardening v3: rescore saved reference/variants/shortcuts with clipped-floor + re-batch-gated evaluators; train same-seed rerun, random-offset variant, all-participants probe; paired noise; ranks; validate"
+notes: "Final hardening: hidden-participant TorchScript evaluation with size/finite/batch-independence/task gates, floor-clipped metrics, fixed baselines; all REDTEAM shortcuts fail or tie; ensemble (+0.60) and random-offset (+0.52) variants beat the reference beyond noise (seed range 0.22); see HARDENING.md"

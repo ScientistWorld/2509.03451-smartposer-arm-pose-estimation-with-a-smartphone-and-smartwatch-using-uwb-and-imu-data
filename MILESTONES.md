@@ -33,3 +33,7 @@
 
 ## Current Limitation
 - Higher milestones require the original synchronized UWB/IMU/Kinect release or additional substitute benchmark settings beyond the current validated package.
+
+### [2026-11-09] - core_claim (final hardening)
+- Hardened the gym into its final form. Submissions are TorchScript fold models that the evaluator runs on 48 hidden participants it generates at test time. Size, finiteness, batch-independence and task-success gates apply; failed runs get the floor value and valid runs are clipped at it. Baselines are fixed inside `eval/`.
+- Reference (hidden slice): 7.79 cm median elbow/wrist error vs 9.27 cm IMU-only; 68.3% of raw range error removed. Both of the paper's claims reproduce in the paper's direction. Two honest variants (2-seed ensemble, random window offsets) beat the reference by more than the noise. Every REDTEAM shortcut fails or ties. See `HARDENING.md`.

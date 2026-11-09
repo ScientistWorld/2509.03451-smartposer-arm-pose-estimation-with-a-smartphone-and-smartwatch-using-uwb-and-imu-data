@@ -1,5 +1,7 @@
 # Verification Report
 
+> Superseded: this report describes the June 2026 prediction-artifact design. The current gym and its audit are in `HARDENING.md`.
+
 ## Initial Assessment
 The workspace already had a validated `core_claim` reproduction on a synthetic SmartPoser substitute benchmark. The claimed milestone was justified: the method implements the paper's two-stage recurrent UWB/range-plus-inertial pose pipeline, includes an IMU-only comparison, and shows both improved pose error and improved range correction.
 
