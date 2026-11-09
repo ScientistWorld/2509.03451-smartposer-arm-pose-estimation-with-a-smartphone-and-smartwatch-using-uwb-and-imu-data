@@ -9,12 +9,20 @@ here from the model outputs and the private ground truth. No number, flag,
 label, comparator or metadata file written by a submission is read.
 
 Gates (any failure scores the submission at the no-skill floor on every metric):
-  * all 10 fold models load as TorchScript, hold at most 92.8k parameters and
-    buffers (and at most the matching tensor storage), keep the whole archive
-    (code, pickled attributes, extra files) under ~1 MB uncompressed, and return
-    finite ``(range [B,125,1], joints [B,125,9])`` for every window;
+  * every directory under ``checkpoints/`` whose name does not start with ``_``
+    (and is not a reserved baseline name) is a submission and must hold all
+    10 fold models;
+  * every fold model loads as TorchScript, holds at most 92.8k parameters and
+    buffers (and at most the matching tensor storage), keeps the whole archive
+    (code, pickled attributes, extra files) under ~1 MB uncompressed, and
+    returns finite ``(range [B,125,1], joints [B,125,9])`` for every window;
+  * each window's output does not depend on which other windows share its
+    batch (a re-batched probe must reproduce the outputs to 1e-3 arm spans);
   * pooled median elbow/wrist error beats the best constant pose (mean_pose);
   * mean range error beats the raw UWB stream (raw_uwb).
+
+A valid submission's scored metrics are clipped at the floor values, so a
+failed submission always holds the worst value of every scored metric.
 """
 
 from __future__ import annotations
@@ -57,6 +65,14 @@ STORAGE_LIMIT_BYTES = 8 * PARAM_LIMIT
 # Without it, capacity could hide in non-tensor attributes or code literals.
 ARCHIVE_LIMIT_BYTES = STORAGE_LIMIT_BYTES + 256 * 1024
 STORAGE_RE = re.compile(r"^[^/]+/(?:data|constants)/[^/]+$")
+PROBE_WINDOWS = 64  # re-batched windows per fold model for the batch-independence gate
+PROBE_TOL = 1e-3  # arm-span units (~0.17 cm); fp32 re-batching noise is ~1e-6
+
+# Full-precision fp32 on GPU (no TF32), so scores and the probe are reproducible.
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = False
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
 
 POSE_EXP = "pose_tracking_synthetic"
 RANGE_EXP = "uwb_correction_synthetic"
@@ -166,6 +182,25 @@ def range_metrics(pred: np.ndarray, true: np.ndarray, raw: np.ndarray, span: np.
     }
 
 
+HIGHER_IS_BETTER = {"uwb_error_reduction_pct", "uwb_correction_win_rate"}
+
+
+def clip_to_floor(metrics: dict[str, float], floor: dict[str, float]) -> dict[str, float]:
+    """No scored metric of a valid submission may be worse than the no-skill floor."""
+    return {k: (max(v, floor[k]) if k in HIGHER_IS_BETTER else min(v, floor[k])) for k, v in metrics.items()}
+
+
+def pose_row(status: dict, floor_pose: dict[str, float]) -> dict[str, float]:
+    scored_floor = {k: v for k, v in floor_pose.items() if k != "param_count_k"}
+    if status["valid"]:
+        row = clip_to_floor(status["pose"], scored_floor)
+        row["param_count_k"] = status["param_count"] / 1000.0
+    else:  # failed: floor on every scored metric, and at least the size limit
+        row = dict(scored_floor)
+        row["param_count_k"] = max(status["param_count"] or 0, PARAM_LIMIT) / 1000.0
+    return row
+
+
 # ── Running submissions ─────────────────────────────────────────────────────
 
 
@@ -228,6 +263,24 @@ def run_model(path: Path, X: np.ndarray, device: torch.device, order: np.ndarray
     return range_out, pose_out
 
 
+def check_batch_independence(
+    path: Path, X: np.ndarray, device: torch.device, order: np.ndarray, range_out: np.ndarray, pose_out: np.ndarray
+) -> None:
+    """Re-run windows from the first and the last batch together, in reverse
+    order and at a different batch size; each window's output must not change.
+    A model that pools information across the windows of a batch fails here."""
+    half = PROBE_WINDOWS // 2
+    idx = np.concatenate([order[:half], order[-half:]])[::-1].copy()
+    module = torch.jit.load(str(path), map_location=device)
+    module.eval()
+    with torch.inference_mode():
+        out = module(torch.from_numpy(X[idx]).to(device))
+    r, j = _check_output(out, len(idx))
+    gap = max(float(np.max(np.abs(r - range_out[idx]))), float(np.max(np.abs(j - pose_out[idx]))))
+    if gap > PROBE_TOL:
+        raise SubmissionError(f"outputs depend on the other windows in the batch (re-batched gap {gap:.3g} > {PROBE_TOL})")
+
+
 def evaluate_submission(fold_paths: dict[int, Path], data: dict, device: torch.device, order: np.ndarray) -> dict:
     status: dict = {"valid": True, "reasons": [], "param_count": None, "storage_bytes": None}
     ranges, poses = [], []
@@ -245,6 +298,7 @@ def evaluate_submission(fold_paths: dict[int, Path], data: dict, device: torch.d
             if storage > STORAGE_LIMIT_BYTES:
                 raise SubmissionError(f"{storage} bytes of stored tensors exceed the {STORAGE_LIMIT_BYTES}-byte limit")
             r, j = run_model(path, data["X"], device, order)
+            check_batch_independence(path, data["X"], device, order, r, j)
         except Exception as exc:  # any failure invalidates the whole submission
             status["valid"] = False
             status["reasons"].append(f"fold {k}: {type(exc).__name__}: {exc}"[:500])
@@ -276,13 +330,13 @@ def discover(checkpoints: Path) -> tuple[dict[str, dict[int, Path]], list[str]]:
     if not checkpoints.is_dir():
         return submissions, skipped
     for d in sorted(p for p in checkpoints.iterdir() if p.is_dir()):
-        fold_dirs = [p for p in d.glob("fold_*") if p.is_dir()]
-        if not fold_dirs:
-            skipped.append(f"{d.name}: no fold_<k>/model.pt submission layout")
+        if d.name.startswith("_") or d.name.startswith("."):
+            skipped.append(f"{d.name}: underscore/dot directory (not a submission)")
             continue
-        if d.name in RESERVED or d.name.startswith("_"):
+        if d.name in RESERVED:
             skipped.append(f"{d.name}: reserved name (fixed by eval/)")
             continue
+        # Every other directory is a submission; missing folds fail it (scored at the floor).
         submissions[d.name] = {k: d / f"fold_{k}" / "model.pt" for k in range(N_FOLDS) if (d / f"fold_{k}" / "model.pt").exists()}
     return submissions, skipped
 
@@ -319,9 +373,7 @@ def main() -> None:
         if st["valid"] and st["pose"]["median_elbow_wrist_cm"] >= floor_pose["median_elbow_wrist_cm"]:
             st["valid"] = False
             st["reasons"].append("pose error not below the constant-pose floor")
-        row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
-        row["param_count_k"] = (st["param_count"] or 0) / 1000.0
-        pose_results[name] = row
+        pose_results[name] = pose_row(st, floor_pose)
         statuses[name] = st
 
     submissions, found_skipped = discover(args.checkpoints_dir)
@@ -335,10 +387,8 @@ def main() -> None:
             if st["range"]["corrected_uwb_mae_cm"] >= floor_range["corrected_uwb_mae_cm"]:
                 st["valid"] = False
                 st["reasons"].append("range error not below the raw UWB stream (raw_uwb)")
-        pose_row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
-        pose_row["param_count_k"] = (st["param_count"] or 0) / 1000.0
-        pose_results[name] = pose_row
-        range_results[name] = dict(st["range"]) if st["valid"] else dict(floor_range)
+        pose_results[name] = pose_row(st, floor_pose)
+        range_results[name] = clip_to_floor(st["range"], floor_range) if st["valid"] else dict(floor_range)
         statuses[name] = st
         print(json.dumps({"method": name, "valid": st["valid"], "reasons": st["reasons"]}), flush=True)
 
@@ -360,6 +410,9 @@ def main() -> None:
             "param_limit": PARAM_LIMIT,
             "storage_limit_bytes": STORAGE_LIMIT_BYTES,
             "archive_limit_bytes": ARCHIVE_LIMIT_BYTES,
+            "batch_probe_windows": PROBE_WINDOWS,
+            "batch_probe_tolerance": PROBE_TOL,
+            "metrics_clipped_at_floor": True,
             "device": str(device),
             "skipped": skipped,
         },

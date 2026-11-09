@@ -9,17 +9,20 @@ the standard deviation of metric m across the valid attempts listed in the
 variants file (reference re-runs, longer/shorter training, architecture and
 training variants), standing in for the spread across future attempts.
 
-Usage: python notes/hardening/rank.py  (writes notes/hardening/ranks.json, prints markdown)
+Usage: python notes/hardening/rank.py [OUT_DIR]
+  (reads <OUT_DIR>/{variants,shortcuts,snapshots}_scores_{test,train}.json,
+   default notes/hardening; writes <OUT_DIR>/ranks.json; prints markdown)
 """
 
 from __future__ import annotations
 
 import json
 import statistics
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-H = ROOT / "notes" / "hardening"
+H = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / "notes" / "hardening"
 REF_METHOD = "smartposer"
 FIXED = {"mean_pose", "raw_uwb", "imu_only"}
 
@@ -112,7 +115,7 @@ def main() -> None:
         variants = load(variants_path)
         spreads = spreads_from(definition, variants)
         report[slice_name] = {"spreads": spreads, "variants": rank_table(definition, ref_scores, variants, spreads)}
-        for extra in ("shortcuts", "snapshots"):
+        for extra in ("shortcuts", "snapshots", "protocol"):
             path = H / f"{extra}_scores_{slice_name}.json"
             if path.exists():
                 report[slice_name][extra] = rank_table(definition, ref_scores, load(path), spreads)
@@ -120,6 +123,9 @@ def main() -> None:
         if seeds:
             report[slice_name]["seed_rank_raw_range"] = max(s["rank_raw"] for s in seeds) - min(s["rank_raw"] for s in seeds)
             report[slice_name]["seed_rank_normalized_range"] = max(s["rank_normalized"] for s in seeds) - min(s["rank_normalized"] for s in seeds)
+        if "smartposer_rerun17" in report[slice_name]["variants"]:
+            r = report[slice_name]["variants"]["smartposer_rerun17"]
+            report[slice_name]["same_seed_rerun_rank"] = {"raw": r["rank_raw"], "normalized": r["rank_normalized"]}
     # Fixed-baseline integrity: the imu_only row in shortcut runs must equal the stored one.
     sc_path = H / "shortcuts_scores_test.json"
     if sc_path.exists():
@@ -134,7 +140,10 @@ def main() -> None:
         print(f"\n## {slice_name} slice (reference = stored `{REF_METHOD}` row)\n")
         if "seed_rank_raw_range" in data:
             print(f"Seed range of rank: raw {data['seed_rank_raw_range']:.3f}, normalized {data['seed_rank_normalized_range']:.3f}\n")
-        for group in ("variants", "snapshots", "shortcuts"):
+        if "same_seed_rerun_rank" in data:
+            rr = data["same_seed_rerun_rank"]
+            print(f"Same-seed rerun of the reference: raw {rr['raw']:+.3f}, normalized {rr['normalized']:+.3f}\n")
+        for group in ("variants", "snapshots", "shortcuts", "protocol"):
             if group not in data:
                 continue
             print(f"### {group}\n")

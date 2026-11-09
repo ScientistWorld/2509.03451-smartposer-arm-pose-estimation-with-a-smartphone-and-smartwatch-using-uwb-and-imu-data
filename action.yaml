@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: core_claim
-notes: "Hardening v2 check: per-fold-seeded reference + IMU-only baseline (dev-selected epochs up to 800), 48-participant hidden test, archive-size gate, new range primary; variants (seeds 18/19, 2-seed ensemble, wider, 2x epochs, shorter snapshots), shortcuts, paired participant bootstrap, ranks, validate."
+notes: "Final hardening v3: rescore saved reference/variants/shortcuts with clipped-floor + re-batch-gated evaluators; train same-seed rerun, random-offset variant, all-participants probe; paired noise; ranks; validate"

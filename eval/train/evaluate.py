@@ -6,10 +6,13 @@ Leave-one-participant-out over the 10 visible development participants in
 rolling windows of participant k, which that model must not have trained on.
 Scores are computed here from the model outputs and the development ground
 truth; nothing else a submission writes is read. Gates mirror the hidden test:
-a submission that fails to load/run, exceeds 92.8k parameters (or a ~1 MB
-uncompressed archive), returns
-non-finite or mis-shaped outputs, does not beat the best constant pose, or does
-not beat the raw range stream is scored at the no-skill floor.
+a submission (any directory under checkpoints/ not starting with ``_`` and not
+a reserved baseline name) that lacks a fold model, fails to load/run, exceeds
+92.8k parameters (or a ~1 MB uncompressed archive), returns non-finite or
+mis-shaped outputs, changes a window's output when the window is re-batched
+with different neighbours, does not beat the best constant pose, or does not
+beat the raw range stream is scored at the no-skill floor. Valid submissions'
+scored metrics are clipped at the floor values.
 """
 
 from __future__ import annotations
@@ -42,6 +45,13 @@ PARAM_LIMIT = 92_800
 STORAGE_LIMIT_BYTES = 8 * PARAM_LIMIT
 ARCHIVE_LIMIT_BYTES = STORAGE_LIMIT_BYTES + 256 * 1024  # tensors + code/pickles/extra files
 STORAGE_PATTERN = re.compile(r"^[^/]+/(?:data|constants)/[^/]+$")
+REBATCH_WINDOWS = 64
+REBATCH_TOLERANCE = 1e-3  # arm-span units
+
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = False
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
 
 POSE_EXP = "pose_tracking_synthetic"
 RANGE_EXP = "uwb_correction_synthetic"
@@ -118,6 +128,27 @@ def range_metrics(pred: np.ndarray, true: np.ndarray, raw: np.ndarray, span: np.
     }
 
 
+RANGE_HIGHER_BETTER = ("uwb_error_reduction_pct", "uwb_correction_win_rate")
+
+
+def floor_clipped(values: dict[str, float], floor: dict[str, float]) -> dict[str, float]:
+    out = {}
+    for key, value in values.items():
+        out[key] = max(value, floor[key]) if key in RANGE_HIGHER_BETTER else min(value, floor[key])
+    return out
+
+
+def pose_entry(status: dict, floor_pose: dict[str, float]) -> dict[str, float]:
+    floor = {k: v for k, v in floor_pose.items() if k != "param_count_k"}
+    if status["valid"]:
+        entry = floor_clipped(status["pose"], floor)
+        entry["param_count_k"] = status["param_count"] / 1000.0
+        return entry
+    entry = dict(floor)
+    entry["param_count_k"] = max(status["param_count"] or 0, PARAM_LIMIT) / 1000.0
+    return entry
+
+
 def model_size(path: Path) -> tuple[int, int]:
     if not path.is_file():
         raise InvalidSubmission(f"missing {path}")
@@ -174,6 +205,19 @@ def predict(path: Path, X: np.ndarray, device: torch.device, order: np.ndarray) 
     return range_out, pose_out
 
 
+def rebatch_check(path: Path, X: np.ndarray, device: torch.device, order: np.ndarray, range_out: np.ndarray, pose_out: np.ndarray) -> None:
+    half = REBATCH_WINDOWS // 2
+    idx = np.concatenate([order[:half], order[-half:]])[::-1].copy()
+    module = torch.jit.load(str(path), map_location=device)
+    module.eval()
+    with torch.inference_mode():
+        out = module(torch.from_numpy(X[idx]).to(device))
+    r, j = _validated(out, len(idx))
+    gap = max(float(np.max(np.abs(r - range_out[idx]))), float(np.max(np.abs(j - pose_out[idx]))))
+    if gap > REBATCH_TOLERANCE:
+        raise InvalidSubmission(f"outputs depend on the other windows in the batch (re-batched gap {gap:.3g} > {REBATCH_TOLERANCE})")
+
+
 def score_submission(fold_paths: dict[int, Path], folds: list[dict], labels: dict, device: torch.device) -> dict:
     status: dict = {"valid": True, "reasons": [], "param_count": None, "storage_bytes": None}
     ranges, poses, counts, storages = [], [], [], []
@@ -191,6 +235,7 @@ def score_submission(fold_paths: dict[int, Path], folds: list[dict], labels: dic
                 raise InvalidSubmission(f"{storage} bytes of stored tensors exceed the {STORAGE_LIMIT_BYTES}-byte limit")
             order = np.random.default_rng(ORDER_SEED + k).permutation(folds[k]["X"].shape[0])
             r, j = predict(path, folds[k]["X"], device, order)
+            rebatch_check(path, folds[k]["X"], device, order, r, j)
         except Exception as exc:
             status["valid"] = False
             status["reasons"].append(f"fold {k}: {type(exc).__name__}: {exc}"[:500])
@@ -213,10 +258,10 @@ def find_submissions(checkpoints: Path) -> tuple[dict[str, dict[int, Path]], lis
     if not checkpoints.is_dir():
         return found, skipped
     for d in sorted(p for p in checkpoints.iterdir() if p.is_dir()):
-        if not any(p.is_dir() for p in d.glob("fold_*")):
-            skipped.append(f"{d.name}: no fold_<k>/model.pt submission layout")
+        if d.name.startswith(("_", ".")):
+            skipped.append(f"{d.name}: underscore/dot directory (not a submission)")
             continue
-        if d.name in RESERVED or d.name.startswith("_"):
+        if d.name in RESERVED:
             skipped.append(f"{d.name}: reserved name (fixed by eval/)")
             continue
         found[d.name] = {k: d / f"fold_{k}" / "model.pt" for k in range(N_FOLDS) if (d / f"fold_{k}" / "model.pt").exists()}
@@ -255,9 +300,7 @@ def main() -> None:
         if st["valid"] and st["pose"]["median_elbow_wrist_cm"] >= floor_pose["median_elbow_wrist_cm"]:
             st["valid"] = False
             st["reasons"].append("pose error not below the constant-pose floor")
-        row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
-        row["param_count_k"] = (st["param_count"] or 0) / 1000.0
-        pose_results[name] = row
+        pose_results[name] = pose_entry(st, floor_pose)
         statuses[name] = st
 
     submissions, found_skipped = find_submissions(args.checkpoints_dir)
@@ -271,10 +314,8 @@ def main() -> None:
             if st["range"]["corrected_uwb_mae_cm"] >= floor_range["corrected_uwb_mae_cm"]:
                 st["valid"] = False
                 st["reasons"].append("range error not below the raw UWB stream (raw_uwb)")
-        pose_row = dict(st["pose"]) if st["valid"] else dict(floor_pose)
-        pose_row["param_count_k"] = (st["param_count"] or 0) / 1000.0
-        pose_results[name] = pose_row
-        range_results[name] = dict(st["range"]) if st["valid"] else dict(floor_range)
+        pose_results[name] = pose_entry(st, floor_pose)
+        range_results[name] = floor_clipped(st["range"], floor_range) if st["valid"] else dict(floor_range)
         statuses[name] = st
         print(json.dumps({"method": name, "valid": st["valid"], "reasons": st["reasons"]}), flush=True)
 
@@ -293,6 +334,9 @@ def main() -> None:
             "param_limit": PARAM_LIMIT,
             "storage_limit_bytes": STORAGE_LIMIT_BYTES,
             "archive_limit_bytes": ARCHIVE_LIMIT_BYTES,
+            "batch_probe_windows": REBATCH_WINDOWS,
+            "batch_probe_tolerance": REBATCH_TOLERANCE,
+            "metrics_clipped_at_floor": True,
             "device": str(device),
             "skipped": skipped,
         },
