@@ -1,0 +1,108 @@
+{
+  "slice": "test",
+  "experiments": {
+    "pose_tracking_synthetic": {
+      "results": {
+        "imu_only": {
+          "median_elbow_cm": 8.829681774502639,
+          "median_wrist_cm": 9.69570767519329,
+          "median_elbow_wrist_cm": 9.26763257307657,
+          "mean_elbow_wrist_cm": 10.477305253927854,
+          "p90_elbow_wrist_cm": 18.953853616700034,
+          "high_motion_mean_elbow_wrist_cm": 10.51922586904906,
+          "param_count_k": 40.777
+        },
+        "mean_pose": {
+          "median_elbow_cm": 18.671948282274087,
+          "median_wrist_cm": 28.13392447092071,
+          "median_elbow_wrist_cm": 22.91929377097306,
+          "mean_elbow_wrist_cm": 24.579383225475347,
+          "p90_elbow_wrist_cm": 38.66616264764279,
+          "high_motion_mean_elbow_wrist_cm": 27.044992387985925,
+          "param_count_k": 0.009
+        },
+        "sc_all_participants": {
+          "median_elbow_cm": 7.413178073667625,
+          "median_wrist_cm": 8.0417700487419,
+          "median_elbow_wrist_cm": 7.733828549991003,
+          "mean_elbow_wrist_cm": 8.919990582894973,
+          "p90_elbow_wrist_cm": 16.224295762391527,
+          "high_motion_mean_elbow_wrist_cm": 8.974574479789878,
+          "param_count_k": 44.698
+        }
+      }
+    },
+    "uwb_correction_synthetic": {
+      "results": {
+        "raw_uwb": {
+          "uwb_error_reduction_pct": 0.0,
+          "corrected_uwb_mae_cm": 13.365821175418958,
+          "corrected_uwb_p90_cm": 34.057903961036224,
+          "occluded_uwb_mae_cm": 32.65259733412491,
+          "uwb_correction_win_rate": 0.0
+        },
+        "sc_all_participants": {
+          "uwb_error_reduction_pct": 68.40380194037279,
+          "corrected_uwb_mae_cm": 4.223091330880968,
+          "corrected_uwb_p90_cm": 8.73065695708533,
+          "occluded_uwb_mae_cm": 5.198243638250379,
+          "uwb_correction_win_rate": 0.7529875578703704
+        }
+      }
+    }
+  },
+  "_status": {
+    "imu_only": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 40777,
+      "storage_bytes": 163108,
+      "pose": {
+        "median_elbow_cm": 8.829681774502639,
+        "median_wrist_cm": 9.69570767519329,
+        "median_elbow_wrist_cm": 9.26763257307657,
+        "mean_elbow_wrist_cm": 10.477305253927854,
+        "p90_elbow_wrist_cm": 18.953853616700034,
+        "high_motion_mean_elbow_wrist_cm": 10.51922586904906
+      }
+    },
+    "sc_all_participants": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 7.413178073667625,
+        "median_wrist_cm": 8.0417700487419,
+        "median_elbow_wrist_cm": 7.733828549991003,
+        "mean_elbow_wrist_cm": 8.919990582894973,
+        "p90_elbow_wrist_cm": 16.224295762391527,
+        "high_motion_mean_elbow_wrist_cm": 8.974574479789878
+      },
+      "range": {
+        "uwb_error_reduction_pct": 68.40380194037279,
+        "corrected_uwb_mae_cm": 4.223091330880968,
+        "corrected_uwb_p90_cm": 8.73065695708533,
+        "occluded_uwb_mae_cm": 5.198243638250379,
+        "uwb_correction_win_rate": 0.7529875578703704
+      }
+    }
+  },
+  "_meta": {
+    "simulator": "smartposer-sim-v2",
+    "participants": 48,
+    "frames_per_participant": 3000,
+    "windows_per_fold_model": 27648,
+    "folds": 10,
+    "target_index": 119,
+    "stride": 5,
+    "param_limit": 92800,
+    "storage_limit_bytes": 742400,
+    "archive_limit_bytes": 1004544,
+    "batch_probe_windows": 64,
+    "batch_probe_tolerance": 0.001,
+    "metrics_clipped_at_floor": true,
+    "device": "cuda",
+    "skipped": []
+  }
+}

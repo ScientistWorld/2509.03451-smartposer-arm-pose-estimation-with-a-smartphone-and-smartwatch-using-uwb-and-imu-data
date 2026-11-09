@@ -4,12 +4,12 @@
     "pose_tracking_synthetic": {
       "results": {
         "imu_only": {
-          "median_elbow_cm": 8.699337988878245,
-          "median_wrist_cm": 9.765943142172553,
-          "median_elbow_wrist_cm": 9.244253551777888,
-          "mean_elbow_wrist_cm": 10.434394181166757,
-          "p90_elbow_wrist_cm": 18.865709819228194,
-          "high_motion_mean_elbow_wrist_cm": 10.378311834890088,
+          "median_elbow_cm": 8.69948806598077,
+          "median_wrist_cm": 9.765986003217712,
+          "median_elbow_wrist_cm": 9.243726382583526,
+          "mean_elbow_wrist_cm": 10.434201585585306,
+          "p90_elbow_wrist_cm": 18.866256319602975,
+          "high_motion_mean_elbow_wrist_cm": 10.378169128763508,
           "param_count_k": 40.777
         },
         "mean_pose": {
@@ -22,12 +22,12 @@
           "param_count_k": 0.009
         },
         "smartposer": {
-          "median_elbow_cm": 7.287823177926771,
-          "median_wrist_cm": 8.108390678287622,
-          "median_elbow_wrist_cm": 7.721402848790958,
-          "mean_elbow_wrist_cm": 8.821573122618977,
-          "p90_elbow_wrist_cm": 15.829562161933934,
-          "high_motion_mean_elbow_wrist_cm": 8.954390139165163,
+          "median_elbow_cm": 7.286866127501769,
+          "median_wrist_cm": 8.109138064922693,
+          "median_elbow_wrist_cm": 7.721790701900456,
+          "mean_elbow_wrist_cm": 8.821666419302572,
+          "p90_elbow_wrist_cm": 15.829440183661134,
+          "high_motion_mean_elbow_wrist_cm": 8.954414182790023,
           "param_count_k": 44.698
         }
       }
@@ -58,12 +58,12 @@
       "param_count": 40777,
       "storage_bytes": 163108,
       "pose": {
-        "median_elbow_cm": 8.699337988878245,
-        "median_wrist_cm": 9.765943142172553,
-        "median_elbow_wrist_cm": 9.244253551777888,
-        "mean_elbow_wrist_cm": 10.434394181166757,
-        "p90_elbow_wrist_cm": 18.865709819228194,
-        "high_motion_mean_elbow_wrist_cm": 10.378311834890088
+        "median_elbow_cm": 8.69948806598077,
+        "median_wrist_cm": 9.765986003217712,
+        "median_elbow_wrist_cm": 9.243726382583526,
+        "mean_elbow_wrist_cm": 10.434201585585306,
+        "p90_elbow_wrist_cm": 18.866256319602975,
+        "high_motion_mean_elbow_wrist_cm": 10.378169128763508
       }
     },
     "smartposer": {
@@ -72,12 +72,12 @@
       "param_count": 44698,
       "storage_bytes": 178792,
       "pose": {
-        "median_elbow_cm": 7.287823177926771,
-        "median_wrist_cm": 8.108390678287622,
-        "median_elbow_wrist_cm": 7.721402848790958,
-        "mean_elbow_wrist_cm": 8.821573122618977,
-        "p90_elbow_wrist_cm": 15.829562161933934,
-        "high_motion_mean_elbow_wrist_cm": 8.954390139165163
+        "median_elbow_cm": 7.286866127501769,
+        "median_wrist_cm": 8.109138064922693,
+        "median_elbow_wrist_cm": 7.721790701900456,
+        "mean_elbow_wrist_cm": 8.821666419302572,
+        "p90_elbow_wrist_cm": 15.829440183661134,
+        "high_motion_mean_elbow_wrist_cm": 8.954414182790023
       },
       "range": {
         "uwb_error_reduction_pct": 67.39254904079486,
@@ -96,6 +96,9 @@
     "param_limit": 92800,
     "storage_limit_bytes": 742400,
     "archive_limit_bytes": 1004544,
+    "batch_probe_windows": 64,
+    "batch_probe_tolerance": 0.001,
+    "metrics_clipped_at_floor": true,
     "device": "cuda",
     "skipped": []
   }
