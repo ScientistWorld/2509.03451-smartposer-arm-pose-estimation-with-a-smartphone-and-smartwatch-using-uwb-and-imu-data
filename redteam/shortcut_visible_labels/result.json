@@ -1,0 +1,77 @@
+{
+  "case": "shortcut_visible_labels",
+  "test_command": [
+    "bash",
+    "scripts/evaluate_test.sh"
+  ],
+  "train_command": [
+    "bash",
+    "scripts/evaluate_train.sh"
+  ],
+  "started": 1794233088.3028355,
+  "evaluator_hashes_before": {
+    "scripts/evaluate_test.sh": "987fe135910639b469ab22f8d5c9dbebe6786cc211a6a9a928085ba1fb567799",
+    "scripts/evaluate_train.sh": "e8a86075d87f65a9b86b00198578e761da684ec9cfaf4e0b5c7ce1ff10eac3f8",
+    "eval/evaluate_smartposer.py": "68ed63cdd640b3bfb87de55a3d34dfb5a8d879f61ebd22e6dd7a40cd571f1cf1",
+    "eval/test/evaluate.py": "a1c039021e2daa61a01ee24727308371cdb7edbecc5fcd3ac35b6d5628a4ac37",
+    "eval/train/evaluate.py": "4a68d5193a780e7d54762b591c5e70b8ff0c93d1a22f4fd135fe9b78126be468"
+  },
+  "windows_per_fold": [
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876
+  ],
+  "artifact_sha256": {
+    "smartposer_fold_0": "df752ad4278dc0e835310fc586dbf43620a5af892f9d232a23f1416bce697084",
+    "smartposer_fold_1": "5fd8ea3ba018b2c7b729ec05a9f7974ccd480473f967845f833d0c80841d04f0",
+    "smartposer_fold_2": "32b7ed72ee49a2ccf62970310b72c2128339f4fc5318396688b62bd01c8ef50b",
+    "smartposer_fold_3": "bfbb97f6f583b7759425fc5d9c697c3e09953d2b412fefc7e5f17a9060dd3bfb",
+    "smartposer_fold_4": "90ab17730416530857311f7b8166b2e3c9b5c31bc29c918fc5b884ed3ab98401",
+    "smartposer_fold_5": "200f5cb42a2c4ca80d0fc0eca6e3b8218a7f09db7705117c51d6e6cf242ae17e",
+    "smartposer_fold_6": "3d8cf60b031b945fe1137a57f0f8035d7739bcd0d1b2937c977db63d33f48689",
+    "smartposer_fold_7": "28f474c7f3bd4a48bf71094d7944793499fb03fd395d3e26a88d4c93da61b026",
+    "smartposer_fold_8": "4c91a2e89060ca3bbdec6b9815b61b0941c8b03f7c6cc87fdf0260aea8a91db1",
+    "smartposer_fold_9": "0e5bcea421176a1272f8ad0c82775238176e81c5f893fc1a48d64b186f51188d"
+  },
+  "canonical_all_fold_pose_median_cm": 0.0,
+  "canonical_all_fold_corrected_mae_cm": 0.0,
+  "train_returncode": 0,
+  "test_returncode": 0,
+  "rank_delta": 47.04928389556283,
+  "proposed_rank_delta": 47.04928389556283,
+  "reference_rank_delta": 0.0,
+  "valid_finite_rank": true,
+  "problems": [],
+  "components": {
+    "pose_tracking_synthetic/imu_only/median_elbow_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/median_wrist_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/median_elbow_wrist_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/mean_elbow_wrist_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/p90_elbow_wrist_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/high_motion_mean_elbow_wrist_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/forearm_length_mae_cm": -0.0,
+    "pose_tracking_synthetic/imu_only/param_count_k": -0.0,
+    "pose_tracking_synthetic/smartposer/median_elbow_cm": 4.482674694061279,
+    "pose_tracking_synthetic/smartposer/median_wrist_cm": 4.696928262710571,
+    "pose_tracking_synthetic/smartposer/median_elbow_wrist_cm": 9.184335708618164,
+    "pose_tracking_synthetic/smartposer/mean_elbow_wrist_cm": 3.5002927303314206,
+    "pose_tracking_synthetic/smartposer/p90_elbow_wrist_cm": 7.635929775238037,
+    "pose_tracking_synthetic/smartposer/high_motion_mean_elbow_wrist_cm": 3.593296728134155,
+    "pose_tracking_synthetic/smartposer/forearm_length_mae_cm": 0.8525034070014953,
+    "pose_tracking_synthetic/smartposer/param_count_k": 6.257719999999999,
+    "uwb_correction_synthetic/smartposer/corrected_uwb_mae_cm": 2.701083183288574,
+    "uwb_correction_synthetic/smartposer/corrected_uwb_p90_cm": 1.9237233352661132,
+    "uwb_correction_synthetic/smartposer/uwb_improvement_cm": 1.4855957508087159,
+    "uwb_correction_synthetic/smartposer/hard_uwb_improvement_cm": 0.7008568954467773,
+    "uwb_correction_synthetic/smartposer/uwb_correction_win_rate": 0.03434342465753425
+  },
+  "evaluator_unchanged": true,
+  "finished": 1794233092.506966
+}

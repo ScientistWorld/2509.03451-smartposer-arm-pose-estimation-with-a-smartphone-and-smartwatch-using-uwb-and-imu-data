@@ -1,0 +1,53 @@
+{
+  "case": "shortcut_metadata_null",
+  "test_command": [
+    "bash",
+    "scripts/evaluate_test.sh"
+  ],
+  "train_command": [
+    "bash",
+    "scripts/evaluate_train.sh"
+  ],
+  "started": 1794233142.588702,
+  "evaluator_hashes_before": {
+    "scripts/evaluate_test.sh": "987fe135910639b469ab22f8d5c9dbebe6786cc211a6a9a928085ba1fb567799",
+    "scripts/evaluate_train.sh": "e8a86075d87f65a9b86b00198578e761da684ec9cfaf4e0b5c7ce1ff10eac3f8",
+    "eval/evaluate_smartposer.py": "68ed63cdd640b3bfb87de55a3d34dfb5a8d879f61ebd22e6dd7a40cd571f1cf1",
+    "eval/test/evaluate.py": "a1c039021e2daa61a01ee24727308371cdb7edbecc5fcd3ac35b6d5628a4ac37",
+    "eval/train/evaluate.py": "4a68d5193a780e7d54762b591c5e70b8ff0c93d1a22f4fd135fe9b78126be468"
+  },
+  "windows_per_fold": [
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876,
+    876
+  ],
+  "artifact_sha256": {
+    "smartposer_fold_0": "83e7441228615726195c0e2c9eb4333e9a35848c5cf6151db6cfcf4c9a80a10b",
+    "smartposer_fold_1": "809a4562d4fac6e9f2d90de210300917f7e4b8a233603ca80cde9dba28674630",
+    "smartposer_fold_2": "448bd096cfb0fe2ba8a10e3981737752781f6fac365c287ec18d5cd6893e2621",
+    "smartposer_fold_3": "ccf48a4476efa99613d7b3341c7f00e2966a7870489ec222e6e7522fb3ff2856",
+    "smartposer_fold_4": "9f1c55af0dc1dfbefda00f2b4fc457bb8a50bb3034d5d320913892ddaec1aa6d",
+    "smartposer_fold_5": "6088005fb162881287627065c6ede0aaaead5b1671189d26f19c0bdafdcdada0",
+    "smartposer_fold_6": "1503120dfd4dc161673c21ec775c8f9c680ddadddb21d96b33574e1c91a2110b",
+    "smartposer_fold_7": "2a1785d70b8708f2e3c20a047fb667418cbeb7c2f6d3cc5d99496149572b3003",
+    "smartposer_fold_8": "5023d05a803f46f4e3e105a7c15e06479247a1e8812a7765cc4f0d8d87bc88eb",
+    "smartposer_fold_9": "a7f93a99d2e77f56989e9d21a7ec323afb191ab371ae2a420f3677d6742b0a94"
+  },
+  "canonical_all_fold_pose_median_cm": 13.658370018005371,
+  "canonical_all_fold_corrected_mae_cm": 9.478155136108398,
+  "train_returncode": 1,
+  "test_returncode": 1,
+  "rank_delta": null,
+  "proposed_rank_delta": null,
+  "valid_finite_rank": false,
+  "test_error_tail": "Traceback (most recent call last):\n  File \"/home/user/eval/test/evaluate.py\", line 286, in <module>\n    main()\n  File \"/home/user/eval/test/evaluate.py\", line 275, in main\n    scores = build_scores(paths, args.block_size)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/user/eval/test/evaluate.py\", line 219, in build_scores\n    pose_results[method] = summarize_pose(slice_paths, block_size, use_full_artifact)\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/user/eval/test/evaluate.py\", line 187, in summarize_pose\n    \"param_count_k\": _metadata_param_count_k(paths),\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/user/eval/test/evaluate.py\", line 98, in _metadata_param_count_k\n    counts.append(float(metadata[\"param_count_k\"]))\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: float() argument must be a string or a real number, not 'NoneType'\n",
+  "evaluator_unchanged": true,
+  "finished": 1794233148.0463018
+}

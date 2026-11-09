@@ -1,0 +1,9 @@
+{
+  "seed_rank_spread": 0.9830520565453622,
+  "seed_pose_spread_cm": 0.5848388671875,
+  "seed_range_mae_spread_cm": 1.2557830810546875,
+  "better_rank_delta": 5.590922732837103,
+  "weaker_rank_delta": -95.60304547965036,
+  "quality_ordering_beyond_spread": true,
+  "all_evaluators_unchanged": true
+}

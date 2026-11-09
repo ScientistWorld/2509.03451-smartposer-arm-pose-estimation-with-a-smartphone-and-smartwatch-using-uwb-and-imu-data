@@ -1,0 +1,51 @@
+{
+  "case": "shortcut_empty_outputs",
+  "test_command": [
+    "bash",
+    "scripts/evaluate_test.sh"
+  ],
+  "train_command": [
+    "bash",
+    "scripts/evaluate_train.sh"
+  ],
+  "started": 1794233153.2097602,
+  "evaluator_hashes_before": {
+    "scripts/evaluate_test.sh": "987fe135910639b469ab22f8d5c9dbebe6786cc211a6a9a928085ba1fb567799",
+    "scripts/evaluate_train.sh": "e8a86075d87f65a9b86b00198578e761da684ec9cfaf4e0b5c7ce1ff10eac3f8",
+    "eval/evaluate_smartposer.py": "68ed63cdd640b3bfb87de55a3d34dfb5a8d879f61ebd22e6dd7a40cd571f1cf1",
+    "eval/test/evaluate.py": "a1c039021e2daa61a01ee24727308371cdb7edbecc5fcd3ac35b6d5628a4ac37",
+    "eval/train/evaluate.py": "4a68d5193a780e7d54762b591c5e70b8ff0c93d1a22f4fd135fe9b78126be468"
+  },
+  "windows_per_fold": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "artifact_sha256": {
+    "smartposer_fold_0": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_1": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_2": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_3": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_4": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_5": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_6": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_7": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_8": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756",
+    "smartposer_fold_9": "030ef5f030f67dd52705ac51c7d60107b04b9ece2b34c12d9dd2b216d7aef756"
+  },
+  "train_returncode": 1,
+  "test_returncode": 1,
+  "rank_delta": null,
+  "proposed_rank_delta": null,
+  "valid_finite_rank": false,
+  "test_error_tail": "/usr/local/lib/python3.11/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice\n  return _methods._mean(a, axis=axis, dtype=dtype,\n/usr/local/lib/python3.11/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in divide\n  ret = ret.dtype.type(ret / rcount)\nTraceback (most recent call last):\n  File \"/home/user/eval/test/evaluate.py\", line 286, in <module>\n    main()\n  File \"/home/user/eval/test/evaluate.py\", line 275, in main\n    scores = build_scores(paths, args.block_size)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/user/eval/test/evaluate.py\", line 219, in build_scores\n    pose_results[method] = summarize_pose(slice_paths, block_size, use_full_artifact)\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/user/eval/test/evaluate.py\", line 184, in summarize_pose\n    \"p90_elbow_wrist_cm\": float(np.percentile(both, 90)),\n                                ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py\", line 4246, in percentile\n    return _quantile_unchecked(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py\", line 4510, in _quantile_unchecked\n    return _ureduce(a,\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py\", line 3880, in _ureduce\n    r = func(a, **kwargs)\n        ^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py\", line 4669, in _quantile_ureduce_func\n    result = _quantile(arr,\n             ^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py\", line 4793, in _quantile\n    slices_having_nans = np.isnan(arr[-1, ...])\n                                  ~~~^^^^^^^^^\nIndexError: index -1 is out of bounds for axis 0 with size 0\n",
+  "evaluator_unchanged": true,
+  "finished": 1794233155.582817
+}
