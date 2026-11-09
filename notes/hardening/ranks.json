@@ -1,0 +1,935 @@
+{
+  "test": {
+    "spreads": {
+      "pose_tracking_synthetic/median_elbow_cm": 0.9362676429548247,
+      "pose_tracking_synthetic/median_wrist_cm": 0.9995311715368731,
+      "pose_tracking_synthetic/median_elbow_wrist_cm": 0.9715776854244188,
+      "pose_tracking_synthetic/mean_elbow_wrist_cm": 0.9139039591673579,
+      "pose_tracking_synthetic/p90_elbow_wrist_cm": 1.3343135674874822,
+      "pose_tracking_synthetic/high_motion_mean_elbow_wrist_cm": 0.7560779292858436,
+      "uwb_correction_synthetic/uwb_error_reduction_pct": 6.332074443264412,
+      "uwb_correction_synthetic/corrected_uwb_p90_cm": 1.6773680871505636,
+      "uwb_correction_synthetic/occluded_uwb_mae_cm": 0.5844102931134607,
+      "uwb_correction_synthetic/uwb_correction_win_rate": 0.04397543361377612
+    },
+    "variants": {
+      "smartposer": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.789215519400002,
+        "corrected_uwb_mae_cm": 4.239496173678117,
+        "measured_median_elbow_wrist_cm": 7.789215519400002,
+        "measured_corrected_uwb_mae_cm": 4.239496173678117,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      },
+      "smartposer_e1": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 23.494563380976267,
+        "measured_corrected_uwb_mae_cm": 76.8707914089977,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "smartposer_e100": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.999289809406484,
+        "corrected_uwb_mae_cm": 4.840629877124201,
+        "measured_median_elbow_wrist_cm": 8.999289809406484,
+        "measured_corrected_uwb_mae_cm": 4.840629877124201,
+        "rank_raw": -4.219840132669104,
+        "rank_normalized": -3.156139693586203
+      },
+      "smartposer_e200": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.340939474919384,
+        "corrected_uwb_mae_cm": 4.49502489981875,
+        "measured_median_elbow_wrist_cm": 8.340939474919384,
+        "measured_corrected_uwb_mae_cm": 4.49502489981875,
+        "rank_raw": -1.7636128128458,
+        "rank_normalized": -1.3380797572543108
+      },
+      "smartposer_e25": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.760445167756307,
+        "corrected_uwb_mae_cm": 7.058587985098957,
+        "measured_median_elbow_wrist_cm": 10.760445167756307,
+        "measured_corrected_uwb_mae_cm": 7.058587985098957,
+        "rank_raw": -13.817080022092158,
+        "rank_normalized": -8.697548104416018
+      },
+      "smartposer_e400": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.03401447265333,
+        "corrected_uwb_mae_cm": 4.35531766536423,
+        "measured_median_elbow_wrist_cm": 8.03401447265333,
+        "measured_corrected_uwb_mae_cm": 4.35531766536423,
+        "rank_raw": -0.745364411178286,
+        "rank_normalized": -0.5632323041887318
+      },
+      "smartposer_e50": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.11847478315184,
+        "corrected_uwb_mae_cm": 5.759014936358548,
+        "measured_median_elbow_wrist_cm": 10.11847478315184,
+        "measured_corrected_uwb_mae_cm": 5.759014936358548,
+        "rank_raw": -9.060153530301204,
+        "rank_normalized": -6.292367260574328
+      },
+      "smartposer_e600": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.882098584229352,
+        "corrected_uwb_mae_cm": 4.294958462606128,
+        "measured_median_elbow_wrist_cm": 7.882098584229352,
+        "measured_corrected_uwb_mae_cm": 4.294958462606128,
+        "rank_raw": -0.295811038960045,
+        "rank_normalized": -0.2124904784548303
+      },
+      "smartposer_ens_seed18_19": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 89396,
+        "median_elbow_wrist_cm": 7.634599557907917,
+        "corrected_uwb_mae_cm": 4.037194190679796,
+        "measured_median_elbow_wrist_cm": 7.634599557907917,
+        "measured_corrected_uwb_mae_cm": 4.037194190679796,
+        "rank_raw": 0.9403586113611283,
+        "rank_normalized": 0.573256053566773
+      },
+      "smartposer_seed18": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.884448525688428,
+        "corrected_uwb_mae_cm": 4.239341936141353,
+        "measured_median_elbow_wrist_cm": 7.884448525688428,
+        "measured_corrected_uwb_mae_cm": 4.239341936141353,
+        "rank_raw": -0.208481595607661,
+        "rank_normalized": -0.21496239286371183
+      },
+      "smartposer_seed19": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.800303306788225,
+        "corrected_uwb_mae_cm": 4.248967531122387,
+        "measured_median_elbow_wrist_cm": 7.800303306788225,
+        "measured_corrected_uwb_mae_cm": 4.248967531122387,
+        "rank_raw": -0.05897304778011026,
+        "rank_normalized": -0.04235319127433692
+      },
+      "smartposer_wider": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 89658,
+        "median_elbow_wrist_cm": 7.907061349262287,
+        "corrected_uwb_mae_cm": 4.236977786620861,
+        "measured_median_elbow_wrist_cm": 7.907061349262287,
+        "measured_corrected_uwb_mae_cm": 4.236977786620861,
+        "rank_raw": -0.43524483139243025,
+        "rank_normalized": -0.4333948520289085
+      },
+      "smartposer_x2epochs": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.933804233063357,
+        "corrected_uwb_mae_cm": 4.151144684768529,
+        "measured_median_elbow_wrist_cm": 7.933804233063357,
+        "measured_corrected_uwb_mae_cm": 4.151144684768529,
+        "rank_raw": -0.3377335626334806,
+        "rank_normalized": -0.4705463315924681
+      }
+    },
+    "shortcuts": {
+      "sc_constant": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 0,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 32.477206009883346,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_hidden_table": {
+        "valid": false,
+        "reasons": [
+          "fold 0: SubmissionError: 144698 parameters+buffers exceed the 92800 limit"
+        ],
+        "param_count": 144698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_inflated_range": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 7.789215519400002,
+        "measured_corrected_uwb_mae_cm": 1700.8578786080884,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_list_table": {
+        "valid": false,
+        "reasons": [
+          "fold 0: SubmissionError: archive holds 2033680 bytes uncompressed, above the 1004544-byte limit"
+        ],
+        "param_count": null,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_metadata_zero": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.789215519400002,
+        "corrected_uwb_mae_cm": 4.239496173678117,
+        "measured_median_elbow_wrist_cm": 7.789215519400002,
+        "measured_corrected_uwb_mae_cm": 4.239496173678117,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      },
+      "sc_nan_outputs": {
+        "valid": false,
+        "reasons": [
+          "fold 0: SubmissionError: non-finite outputs"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_one_fold": {
+        "valid": false,
+        "reasons": [
+          "fold 1: SubmissionError: missing fold model"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_oversized": {
+        "valid": false,
+        "reasons": [
+          "fold 0: SubmissionError: 151002 parameters+buffers exceed the 92800 limit"
+        ],
+        "param_count": 151002,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "sc_subset_outputs": {
+        "valid": false,
+        "reasons": [
+          "fold 0: SubmissionError: output shapes (256, 125, 1) / (256, 125, 9); expected (512, 125, 1) / (512, 125, 9)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      }
+    },
+    "snapshots": {
+      "imu_only_e100": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 9.672776132932452,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e200": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 9.385461203343308,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e25": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 10.775810833710779,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e400": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 9.267723752149605,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e50": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 10.210473148192072,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e600": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 9.270439590805642,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "imu_only_e800": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 9.280326424144555,
+        "measured_corrected_uwb_mae_cm": 13.36582117541896,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "smartposer_e1": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.91929377097306,
+        "corrected_uwb_mae_cm": 13.365821175418958,
+        "measured_median_elbow_wrist_cm": 23.494563380976267,
+        "measured_corrected_uwb_mae_cm": 76.8707914089977,
+        "rank_raw": -62.87556610170389,
+        "rank_normalized": -48.428744805019484
+      },
+      "smartposer_e100": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.999289809406484,
+        "corrected_uwb_mae_cm": 4.840629877124201,
+        "measured_median_elbow_wrist_cm": 8.999289809406484,
+        "measured_corrected_uwb_mae_cm": 4.840629877124201,
+        "rank_raw": -4.219840132669104,
+        "rank_normalized": -3.156139693586203
+      },
+      "smartposer_e200": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.340939474919384,
+        "corrected_uwb_mae_cm": 4.49502489981875,
+        "measured_median_elbow_wrist_cm": 8.340939474919384,
+        "measured_corrected_uwb_mae_cm": 4.49502489981875,
+        "rank_raw": -1.7636128128458,
+        "rank_normalized": -1.3380797572543108
+      },
+      "smartposer_e25": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.760445167756307,
+        "corrected_uwb_mae_cm": 7.058587985098957,
+        "measured_median_elbow_wrist_cm": 10.760445167756307,
+        "measured_corrected_uwb_mae_cm": 7.058587985098957,
+        "rank_raw": -13.817080022092158,
+        "rank_normalized": -8.697548104416018
+      },
+      "smartposer_e400": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.03401447265333,
+        "corrected_uwb_mae_cm": 4.35531766536423,
+        "measured_median_elbow_wrist_cm": 8.03401447265333,
+        "measured_corrected_uwb_mae_cm": 4.35531766536423,
+        "rank_raw": -0.745364411178286,
+        "rank_normalized": -0.5632323041887318
+      },
+      "smartposer_e50": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.11847478315184,
+        "corrected_uwb_mae_cm": 5.759014936358548,
+        "measured_median_elbow_wrist_cm": 10.11847478315184,
+        "measured_corrected_uwb_mae_cm": 5.759014936358548,
+        "rank_raw": -9.060153530301204,
+        "rank_normalized": -6.292367260574328
+      },
+      "smartposer_e600": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.882098584229352,
+        "corrected_uwb_mae_cm": 4.294958462606128,
+        "measured_median_elbow_wrist_cm": 7.882098584229352,
+        "measured_corrected_uwb_mae_cm": 4.294958462606128,
+        "rank_raw": -0.295811038960045,
+        "rank_normalized": -0.2124904784548303
+      },
+      "smartposer_e800": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.789215519400002,
+        "corrected_uwb_mae_cm": 4.239496173678117,
+        "measured_median_elbow_wrist_cm": 7.789215519400002,
+        "measured_corrected_uwb_mae_cm": 4.239496173678117,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      }
+    },
+    "seed_rank_raw_range": 0.208481595607661,
+    "seed_rank_normalized_range": 0.21496239286371183
+  },
+  "train": {
+    "spreads": {
+      "pose_tracking_synthetic/median_elbow_cm": 1.0305096803703144,
+      "pose_tracking_synthetic/median_wrist_cm": 1.1373283755488701,
+      "pose_tracking_synthetic/median_elbow_wrist_cm": 1.0910765688851696,
+      "pose_tracking_synthetic/mean_elbow_wrist_cm": 1.0387938086426785,
+      "pose_tracking_synthetic/p90_elbow_wrist_cm": 1.5407273051374892,
+      "pose_tracking_synthetic/high_motion_mean_elbow_wrist_cm": 0.9129691705246277,
+      "uwb_correction_synthetic/uwb_error_reduction_pct": 7.236760010912844,
+      "uwb_correction_synthetic/corrected_uwb_p90_cm": 1.842058646959715,
+      "uwb_correction_synthetic/occluded_uwb_mae_cm": 0.6831961909876925,
+      "uwb_correction_synthetic/uwb_correction_win_rate": 0.04707230631661792
+    },
+    "variants": {
+      "smartposer": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.721402848790958,
+        "corrected_uwb_mae_cm": 4.260573403077118,
+        "measured_median_elbow_wrist_cm": 7.721402848790958,
+        "measured_corrected_uwb_mae_cm": 4.260573403077118,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      },
+      "smartposer_e1": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 23.57371517324367,
+        "measured_corrected_uwb_mae_cm": 77.57146402850215,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "smartposer_e100": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 9.091539144263237,
+        "corrected_uwb_mae_cm": 4.79146976230938,
+        "measured_median_elbow_wrist_cm": 9.091539144263237,
+        "measured_corrected_uwb_mae_cm": 4.79146976230938,
+        "rank_raw": -4.503594570267259,
+        "rank_normalized": -3.1280184733349876
+      },
+      "smartposer_e200": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.245628439504834,
+        "corrected_uwb_mae_cm": 4.462468138781928,
+        "measured_median_elbow_wrist_cm": 8.245628439504834,
+        "measured_corrected_uwb_mae_cm": 4.462468138781928,
+        "rank_raw": -1.765433848217263,
+        "rank_normalized": -1.2338156471802828
+      },
+      "smartposer_e25": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.984187367310064,
+        "corrected_uwb_mae_cm": 7.413489007752812,
+        "measured_median_elbow_wrist_cm": 10.984187367310064,
+        "measured_corrected_uwb_mae_cm": 7.413489007752812,
+        "rank_raw": -15.581592282563237,
+        "rank_normalized": -8.555029386803485
+      },
+      "smartposer_e400": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.017938560669169,
+        "corrected_uwb_mae_cm": 4.3586313128260485,
+        "measured_median_elbow_wrist_cm": 8.017938560669169,
+        "measured_corrected_uwb_mae_cm": 4.3586313128260485,
+        "rank_raw": -0.93388263976148,
+        "rank_normalized": -0.6726744222191801
+      },
+      "smartposer_e50": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.30691863207603,
+        "corrected_uwb_mae_cm": 5.822546113670437,
+        "measured_median_elbow_wrist_cm": 10.30691863207603,
+        "measured_corrected_uwb_mae_cm": 5.822546113670437,
+        "rank_raw": -9.954904192060836,
+        "rank_normalized": -6.195043861510946
+      },
+      "smartposer_e600": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.821922366253972,
+        "corrected_uwb_mae_cm": 4.308837016629392,
+        "measured_median_elbow_wrist_cm": 7.821922366253972,
+        "measured_corrected_uwb_mae_cm": 4.308837016629392,
+        "rank_raw": -0.3336065844779655,
+        "rank_normalized": -0.22018466779437038
+      },
+      "smartposer_ens_seed18_19": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 89396,
+        "median_elbow_wrist_cm": 7.506477171353975,
+        "corrected_uwb_mae_cm": 3.9671816900392636,
+        "measured_median_elbow_wrist_cm": 7.506477171353975,
+        "measured_corrected_uwb_mae_cm": 3.9671816900392636,
+        "rank_raw": 1.2793168247334357,
+        "rank_normalized": 0.6472506034487372
+      },
+      "smartposer_seed18": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.749769858977263,
+        "corrected_uwb_mae_cm": 4.134304973608814,
+        "measured_median_elbow_wrist_cm": 7.749769858977263,
+        "measured_corrected_uwb_mae_cm": 4.134304973608814,
+        "rank_raw": 0.1585241676382638,
+        "rank_normalized": -0.05445232333300312
+      },
+      "smartposer_seed19": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.65342229119311,
+        "corrected_uwb_mae_cm": 4.208843152297878,
+        "measured_median_elbow_wrist_cm": 7.65342229119311,
+        "measured_corrected_uwb_mae_cm": 4.208843152297878,
+        "rank_raw": 0.2867311312332011,
+        "rank_normalized": 0.15620331868855564
+      },
+      "smartposer_wider": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 89658,
+        "median_elbow_wrist_cm": 7.781320798851648,
+        "corrected_uwb_mae_cm": 4.252132078603897,
+        "measured_median_elbow_wrist_cm": 7.781320798851648,
+        "measured_corrected_uwb_mae_cm": 4.252132078603897,
+        "rank_raw": -0.23362701830917496,
+        "rank_normalized": -0.21511963285901142
+      },
+      "smartposer_x2epochs": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.793102606978293,
+        "corrected_uwb_mae_cm": 4.1658990732925005,
+        "measured_median_elbow_wrist_cm": 7.793102606978293,
+        "measured_corrected_uwb_mae_cm": 4.1658990732925005,
+        "rank_raw": -0.081950771176528,
+        "rank_normalized": -0.20827617063440715
+      }
+    },
+    "shortcuts": {
+      "sc_constant": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 0,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 32.60875420991445,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_hidden_table": {
+        "valid": false,
+        "reasons": [
+          "fold 0: InvalidSubmission: 144698 parameters+buffers exceed the 92800 limit"
+        ],
+        "param_count": 144698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_inflated_range": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 7.721402848790958,
+        "measured_corrected_uwb_mae_cm": 1702.1973644682178,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_list_table": {
+        "valid": false,
+        "reasons": [
+          "fold 0: InvalidSubmission: archive holds 2033680 bytes uncompressed, above the 1004544-byte limit"
+        ],
+        "param_count": null,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_metadata_zero": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.721402848790958,
+        "corrected_uwb_mae_cm": 4.260573403077118,
+        "measured_median_elbow_wrist_cm": 7.721402848790958,
+        "measured_corrected_uwb_mae_cm": 4.260573403077118,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      },
+      "sc_nan_outputs": {
+        "valid": false,
+        "reasons": [
+          "fold 0: InvalidSubmission: non-finite outputs"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_one_fold": {
+        "valid": false,
+        "reasons": [
+          "fold 1: InvalidSubmission: missing fold model"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_oversized": {
+        "valid": false,
+        "reasons": [
+          "fold 0: InvalidSubmission: 151002 parameters+buffers exceed the 92800 limit"
+        ],
+        "param_count": 151002,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "sc_subset_outputs": {
+        "valid": false,
+        "reasons": [
+          "fold 0: InvalidSubmission: output shapes (256, 125, 1) / (256, 125, 9); expected (512, 125, 1) / (512, 125, 9)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": null,
+        "measured_corrected_uwb_mae_cm": null,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      }
+    },
+    "snapshots": {
+      "imu_only_e100": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 9.866462094793302,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e200": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 9.43751655180936,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e25": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 10.87451326158654,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e400": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 9.244253551777888,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e50": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 10.333949790552214,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e600": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 9.294695953484917,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "imu_only_e800": {
+        "valid": false,
+        "reasons": [
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 40777,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 9.31886377668117,
+        "measured_corrected_uwb_mae_cm": 13.066257182775434,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "smartposer_e1": {
+        "valid": false,
+        "reasons": [
+          "pose error not below the constant-pose floor (mean_pose)",
+          "range error not below the raw UWB stream (raw_uwb)"
+        ],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 22.82787981211469,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "measured_median_elbow_wrist_cm": 23.57371517324367,
+        "measured_corrected_uwb_mae_cm": 77.57146402850215,
+        "rank_raw": -62.58864351689082,
+        "rank_normalized": -42.33934755769577
+      },
+      "smartposer_e100": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 9.091539144263237,
+        "corrected_uwb_mae_cm": 4.79146976230938,
+        "measured_median_elbow_wrist_cm": 9.091539144263237,
+        "measured_corrected_uwb_mae_cm": 4.79146976230938,
+        "rank_raw": -4.503594570267259,
+        "rank_normalized": -3.1280184733349876
+      },
+      "smartposer_e200": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.245628439504834,
+        "corrected_uwb_mae_cm": 4.462468138781928,
+        "measured_median_elbow_wrist_cm": 8.245628439504834,
+        "measured_corrected_uwb_mae_cm": 4.462468138781928,
+        "rank_raw": -1.765433848217263,
+        "rank_normalized": -1.2338156471802828
+      },
+      "smartposer_e25": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.984187367310064,
+        "corrected_uwb_mae_cm": 7.413489007752812,
+        "measured_median_elbow_wrist_cm": 10.984187367310064,
+        "measured_corrected_uwb_mae_cm": 7.413489007752812,
+        "rank_raw": -15.581592282563237,
+        "rank_normalized": -8.555029386803485
+      },
+      "smartposer_e400": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 8.017938560669169,
+        "corrected_uwb_mae_cm": 4.3586313128260485,
+        "measured_median_elbow_wrist_cm": 8.017938560669169,
+        "measured_corrected_uwb_mae_cm": 4.3586313128260485,
+        "rank_raw": -0.93388263976148,
+        "rank_normalized": -0.6726744222191801
+      },
+      "smartposer_e50": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 10.30691863207603,
+        "corrected_uwb_mae_cm": 5.822546113670437,
+        "measured_median_elbow_wrist_cm": 10.30691863207603,
+        "measured_corrected_uwb_mae_cm": 5.822546113670437,
+        "rank_raw": -9.954904192060836,
+        "rank_normalized": -6.195043861510946
+      },
+      "smartposer_e600": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.821922366253972,
+        "corrected_uwb_mae_cm": 4.308837016629392,
+        "measured_median_elbow_wrist_cm": 7.821922366253972,
+        "measured_corrected_uwb_mae_cm": 4.308837016629392,
+        "rank_raw": -0.3336065844779655,
+        "rank_normalized": -0.22018466779437038
+      },
+      "smartposer_e800": {
+        "valid": true,
+        "reasons": [],
+        "param_count": 44698,
+        "median_elbow_wrist_cm": 7.721402848790958,
+        "corrected_uwb_mae_cm": 4.260573403077118,
+        "measured_median_elbow_wrist_cm": 7.721402848790958,
+        "measured_corrected_uwb_mae_cm": 4.260573403077118,
+        "rank_raw": 0.0,
+        "rank_normalized": 0.0
+      }
+    },
+    "seed_rank_raw_range": 0.2867311312332011,
+    "seed_rank_normalized_range": 0.21065564202155876
+  },
+  "fixed_baseline_unchanged_under_replacement": true
+}

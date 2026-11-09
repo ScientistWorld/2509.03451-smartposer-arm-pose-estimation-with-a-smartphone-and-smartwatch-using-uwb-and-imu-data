@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: core_claim
-notes: "Hardening bundle: write dev participants (private simulator), smoke-test new TorchScript-based evaluators, snapshot-train SmartPoser/IMU-only and select epochs on dev LOSO, install reference + fixed baseline, score train/test, train variants (seeds 18/19, wider, window offsets, snapshots) and shortcuts, compute ranks."
+notes: "Hardening v2 check: per-fold-seeded reference + IMU-only baseline (dev-selected epochs up to 800), 48-participant hidden test, archive-size gate, new range primary; variants (seeds 18/19, 2-seed ensemble, wider, 2x epochs, shorter snapshots), shortcuts, paired participant bootstrap, ranks, validate."

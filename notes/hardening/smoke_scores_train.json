@@ -1,0 +1,145 @@
+{
+  "slice": "train",
+  "experiments": {
+    "pose_tracking_synthetic": {
+      "results": {
+        "imu_only": {
+          "median_elbow_cm": 8.6322458467676,
+          "median_wrist_cm": 9.56698578976464,
+          "median_elbow_wrist_cm": 9.120508207184344,
+          "mean_elbow_wrist_cm": 10.347896719047409,
+          "p90_elbow_wrist_cm": 18.67009609037632,
+          "high_motion_mean_elbow_wrist_cm": 10.239056445926757,
+          "param_count_k": 40.777
+        },
+        "imu_only_smoke": {
+          "median_elbow_cm": 18.525609754500415,
+          "median_wrist_cm": 28.122686718523152,
+          "median_elbow_wrist_cm": 22.82787981211469,
+          "mean_elbow_wrist_cm": 24.435392423169272,
+          "p90_elbow_wrist_cm": 38.59247484086987,
+          "high_motion_mean_elbow_wrist_cm": 26.84946383667592,
+          "param_count_k": 40.777
+        },
+        "mean_pose": {
+          "median_elbow_cm": 18.525609754500415,
+          "median_wrist_cm": 28.122686718523152,
+          "median_elbow_wrist_cm": 22.82787981211469,
+          "mean_elbow_wrist_cm": 24.435392423169272,
+          "p90_elbow_wrist_cm": 38.59247484086987,
+          "high_motion_mean_elbow_wrist_cm": 26.84946383667592,
+          "param_count_k": 0.009
+        },
+        "smartposer_smoke": {
+          "median_elbow_cm": 18.525609754500415,
+          "median_wrist_cm": 28.122686718523152,
+          "median_elbow_wrist_cm": 22.82787981211469,
+          "mean_elbow_wrist_cm": 24.435392423169272,
+          "p90_elbow_wrist_cm": 38.59247484086987,
+          "high_motion_mean_elbow_wrist_cm": 26.84946383667592,
+          "param_count_k": 44.698
+        }
+      }
+    },
+    "uwb_correction_synthetic": {
+      "results": {
+        "imu_only_smoke": {
+          "uwb_error_reduction_pct": 0.0,
+          "corrected_uwb_mae_cm": 13.066257182775434,
+          "corrected_uwb_p90_cm": 33.31097578356709,
+          "occluded_uwb_mae_cm": 32.00946657856808,
+          "uwb_correction_win_rate": 0.0
+        },
+        "raw_uwb": {
+          "uwb_error_reduction_pct": 0.0,
+          "corrected_uwb_mae_cm": 13.066257182775434,
+          "corrected_uwb_p90_cm": 33.31097578356709,
+          "occluded_uwb_mae_cm": 32.00946657856808,
+          "uwb_correction_win_rate": 0.0
+        },
+        "smartposer_smoke": {
+          "uwb_error_reduction_pct": 0.0,
+          "corrected_uwb_mae_cm": 13.066257182775434,
+          "corrected_uwb_p90_cm": 33.31097578356709,
+          "occluded_uwb_mae_cm": 32.00946657856808,
+          "uwb_correction_win_rate": 0.0
+        }
+      }
+    }
+  },
+  "_status": {
+    "imu_only": {
+      "valid": true,
+      "reasons": [],
+      "param_count": 40777,
+      "storage_bytes": 163108,
+      "pose": {
+        "median_elbow_cm": 8.6322458467676,
+        "median_wrist_cm": 9.56698578976464,
+        "median_elbow_wrist_cm": 9.120508207184344,
+        "mean_elbow_wrist_cm": 10.347896719047409,
+        "p90_elbow_wrist_cm": 18.67009609037632,
+        "high_motion_mean_elbow_wrist_cm": 10.239056445926757
+      }
+    },
+    "imu_only_smoke": {
+      "valid": false,
+      "reasons": [
+        "pose error not below the constant-pose floor (mean_pose)",
+        "range error not below the raw UWB stream (raw_uwb)"
+      ],
+      "param_count": 40777,
+      "storage_bytes": 163108,
+      "pose": {
+        "median_elbow_cm": 19.25014095840505,
+        "median_wrist_cm": 27.534441860367796,
+        "median_elbow_wrist_cm": 22.939566419217606,
+        "mean_elbow_wrist_cm": 24.204139692807612,
+        "p90_elbow_wrist_cm": 38.83380135713698,
+        "high_motion_mean_elbow_wrist_cm": 26.448190936023547
+      },
+      "range": {
+        "uwb_error_reduction_pct": 0.0,
+        "corrected_uwb_mae_cm": 13.066257182775434,
+        "corrected_uwb_p90_cm": 33.31097578356709,
+        "occluded_uwb_mae_cm": 32.00946657856808,
+        "uwb_correction_win_rate": 0.0
+      }
+    },
+    "smartposer_smoke": {
+      "valid": false,
+      "reasons": [
+        "pose error not below the constant-pose floor (mean_pose)",
+        "range error not below the raw UWB stream (raw_uwb)"
+      ],
+      "param_count": 44698,
+      "storage_bytes": 178792,
+      "pose": {
+        "median_elbow_cm": 19.040241689969058,
+        "median_wrist_cm": 30.24048055776302,
+        "median_elbow_wrist_cm": 23.57371517324367,
+        "mean_elbow_wrist_cm": 25.28274369150019,
+        "p90_elbow_wrist_cm": 41.84438847901352,
+        "high_motion_mean_elbow_wrist_cm": 27.503425788878786
+      },
+      "range": {
+        "uwb_error_reduction_pct": -493.6777681887401,
+        "corrected_uwb_mae_cm": 77.57146402850215,
+        "corrected_uwb_p90_cm": 107.15638212340829,
+        "occluded_uwb_mae_cm": 80.1773743359178,
+        "uwb_correction_win_rate": 0.005303030303030303
+      }
+    }
+  },
+  "_meta": {
+    "participants": 10,
+    "windows": 23760,
+    "target_index": 119,
+    "stride": 5,
+    "param_limit": 92800,
+    "storage_limit_bytes": 742400,
+    "archive_limit_bytes": 1004544,
+    "device": "cuda",
+    "skipped": []
+  }
+}
