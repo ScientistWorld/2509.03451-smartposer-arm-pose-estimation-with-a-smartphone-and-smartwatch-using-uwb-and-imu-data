@@ -9,7 +9,7 @@ import argparse
 import json
 import shutil
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import torch
 from torch import nn
@@ -73,6 +73,23 @@ class HiddenTable(nn.Module):
         return r, j + 0.0 * self.table[0]
 
 
+class ListTable(nn.Module):
+    """Reference model plus a 200k-float list attribute: capacity stored in the
+    pickled module state, which neither parameters, buffers nor tensor storage
+    count. Caught only by the whole-archive size limit."""
+
+    table: List[float]
+
+    def __init__(self, inner: torch.jit.ScriptModule) -> None:
+        super().__init__()
+        self.inner = inner
+        self.table = [0.0] * 200_000
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        r, j = self.inner(x)
+        return r, j + 0.0 * self.table[0]
+
+
 def save(module: nn.Module, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     module = module.eval()
@@ -121,6 +138,7 @@ def main() -> None:
         save(NaNOutputs(torch.jit.load(str(inner_path))), out / "sc_nan_outputs" / f"fold_{k}" / "model.pt")
         save(HalfBatch(torch.jit.load(str(inner_path))), out / "sc_subset_outputs" / f"fold_{k}" / "model.pt")
         save(HiddenTable(torch.jit.load(str(inner_path))), out / "sc_hidden_table" / f"fold_{k}" / "model.pt")
+        save(ListTable(torch.jit.load(str(inner_path))), out / "sc_list_table" / f"fold_{k}" / "model.pt")
 
 
 if __name__ == "__main__":

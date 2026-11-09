@@ -14,7 +14,7 @@ cd "$(dirname "$0")/.."
 
 bash scripts/download.sh
 python baseline/train_imu_only.py --data-dir data/smartposer_dev --out-dir checkpoints/imu_only \
-  --epochs "${BASELINE_EPOCHS:-200}" --seed 19 "$@"
+  --epochs "${BASELINE_EPOCHS:-800}" --seed 19 "$@"
 for side in train test; do
   dest="eval/$side/fixed_models/imu_only"
   if [ "${REFREEZE_BASELINE:-0}" = "1" ] || [ ! -f "$dest/fold_9.pt" ]; then

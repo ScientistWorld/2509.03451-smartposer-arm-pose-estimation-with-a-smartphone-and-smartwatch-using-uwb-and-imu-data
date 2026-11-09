@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 
 bash scripts/download.sh
 python method/train_smartposer.py --data-dir data/smartposer_dev --out-dir checkpoints/smartposer \
-  --epochs "${METHOD_EPOCHS:-200}" --seed "${METHOD_SEED:-17}" "$@"
+  --epochs "${METHOD_EPOCHS:-800}" --seed "${METHOD_SEED:-17}" "$@"
 if [ "${SKIP_EVAL:-0}" != "1" ]; then
   bash scripts/evaluate.sh
 fi

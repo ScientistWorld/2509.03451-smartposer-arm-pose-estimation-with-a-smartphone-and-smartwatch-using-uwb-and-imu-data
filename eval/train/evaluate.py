@@ -6,7 +6,8 @@ Leave-one-participant-out over the 10 visible development participants in
 rolling windows of participant k, which that model must not have trained on.
 Scores are computed here from the model outputs and the development ground
 truth; nothing else a submission writes is read. Gates mirror the hidden test:
-a submission that fails to load/run, exceeds 92.8k parameters, returns
+a submission that fails to load/run, exceeds 92.8k parameters (or a ~1 MB
+uncompressed archive), returns
 non-finite or mis-shaped outputs, does not beat the best constant pose, or does
 not beat the raw range stream is scored at the no-skill floor.
 """
@@ -39,6 +40,7 @@ BATCH = 512
 ORDER_SEED = 1109
 PARAM_LIMIT = 92_800
 STORAGE_LIMIT_BYTES = 8 * PARAM_LIMIT
+ARCHIVE_LIMIT_BYTES = STORAGE_LIMIT_BYTES + 256 * 1024  # tensors + code/pickles/extra files
 STORAGE_PATTERN = re.compile(r"^[^/]+/(?:data|constants)/[^/]+$")
 
 POSE_EXP = "pose_tracking_synthetic"
@@ -106,8 +108,10 @@ def pose_metrics(pred: np.ndarray, true: np.ndarray, span: np.ndarray, high_moti
 def range_metrics(pred: np.ndarray, true: np.ndarray, raw: np.ndarray, span: np.ndarray, hard: np.ndarray) -> dict[str, float]:
     corrected_err = np.abs(pred - true) * span * 100.0
     raw_err = np.abs(raw - true) * span * 100.0
+    mae = float(np.mean(corrected_err))
     return {
-        "corrected_uwb_mae_cm": float(np.mean(corrected_err)),
+        "uwb_error_reduction_pct": 100.0 * (1.0 - mae / float(np.mean(raw_err))),
+        "corrected_uwb_mae_cm": mae,
         "corrected_uwb_p90_cm": float(np.percentile(corrected_err, 90)),
         "occluded_uwb_mae_cm": float(np.mean(corrected_err[hard])),
         "uwb_correction_win_rate": float(np.mean(corrected_err < raw_err)),
@@ -119,9 +123,13 @@ def model_size(path: Path) -> tuple[int, int]:
         raise InvalidSubmission(f"missing {path}")
     try:
         with zipfile.ZipFile(path) as zf:
-            storage = sum(info.file_size for info in zf.infolist() if STORAGE_PATTERN.match(info.filename))
+            entries = zf.infolist()
     except zipfile.BadZipFile as exc:
         raise InvalidSubmission(f"{path} is not a TorchScript archive") from exc
+    archive = sum(e.file_size for e in entries)
+    if archive > ARCHIVE_LIMIT_BYTES:
+        raise InvalidSubmission(f"archive holds {archive} bytes uncompressed, above the {ARCHIVE_LIMIT_BYTES}-byte limit")
+    storage = sum(e.file_size for e in entries if STORAGE_PATTERN.match(e.filename))
     module = torch.jit.load(str(path), map_location="cpu")
     seen: set[tuple[int, int]] = set()
     total = 0
@@ -284,6 +292,7 @@ def main() -> None:
             "stride": STRIDE,
             "param_limit": PARAM_LIMIT,
             "storage_limit_bytes": STORAGE_LIMIT_BYTES,
+            "archive_limit_bytes": ARCHIVE_LIMIT_BYTES,
             "device": str(device),
             "skipped": skipped,
         },

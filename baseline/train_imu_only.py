@@ -65,7 +65,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-dir", type=Path, default=Path("data/smartposer_dev"))
     ap.add_argument("--out-dir", type=Path, default=Path("checkpoints/imu_only"))
-    ap.add_argument("--epochs", type=int, default=150)
+    ap.add_argument("--epochs", type=int, default=800)
     ap.add_argument("--snapshot-epochs", type=int, nargs="*", default=None)
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)
@@ -84,7 +84,10 @@ def main() -> None:
             targets = {args.epochs: args.out_dir / f"fold_{fold}"}
         if all((d / "complete.json").exists() and (d / "model.pt").exists() for d in targets.values()):
             continue
-        torch.manual_seed(args.seed)
+        # Independent seed per fold: the ten fold models are separate draws, so
+        # pooling them averages out training noise instead of repeating it.
+        fold_seed = args.seed * 1000 + fold
+        torch.manual_seed(fold_seed)
         x, j = make_windows([s for i, s in enumerate(subjects) if i != fold])
         X, J = torch.from_numpy(x).to(device), torch.from_numpy(j).to(device)
         model = IMUOnlyPose().to(device)
@@ -112,6 +115,7 @@ def main() -> None:
                     "held_out_participant": fold,
                     "epochs": epoch,
                     "seed": args.seed,
+                    "fold_seed": fold_seed,
                     "param_count": sum(p.numel() for p in model.parameters()),
                     "train_loss": float(total) / batches,
                     "training_seconds": time.time() - started,

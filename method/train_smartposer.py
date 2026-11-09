@@ -75,8 +75,11 @@ def export(model: torch.nn.Module, fold_dir: Path, meta: dict) -> None:
 
 
 def train_fold(args: argparse.Namespace, subjects: list[dict], fold: int, targets: dict[int, Path], device: torch.device) -> None:
-    torch.manual_seed(args.seed)
-    offset_rng = np.random.default_rng(args.seed * 1000 + fold)
+    # Independent seed per fold: the ten fold models are separate draws, so
+    # pooling them averages out training noise instead of repeating it.
+    fold_seed = args.seed * 1000 + fold
+    torch.manual_seed(fold_seed)
+    offset_rng = np.random.default_rng(fold_seed)
     train_subjects = [s for i, s in enumerate(subjects) if i != fold]
 
     def to_device(offsets: list[int]) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -112,6 +115,7 @@ def train_fold(args: argparse.Namespace, subjects: list[dict], fold: int, target
                 "held_out_participant": fold,
                 "epochs": epoch,
                 "seed": args.seed,
+                "fold_seed": fold_seed,
                 "pose_hidden": args.pose_hidden,
                 "random_offsets": bool(args.random_offsets),
                 "uwb_loss_weight": args.uwb_loss_weight,
@@ -128,7 +132,7 @@ def main() -> None:
     ap.add_argument("--data-dir", type=Path, default=Path("data/smartposer_dev"))
     ap.add_argument("--out-dir", type=Path, default=Path("checkpoints/smartposer"))
     ap.add_argument("--name", default=None)
-    ap.add_argument("--epochs", type=int, default=150)
+    ap.add_argument("--epochs", type=int, default=800)
     ap.add_argument("--snapshot-epochs", type=int, nargs="*", default=None)
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)

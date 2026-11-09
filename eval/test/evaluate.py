@@ -10,8 +10,9 @@ label, comparator or metadata file written by a submission is read.
 
 Gates (any failure scores the submission at the no-skill floor on every metric):
   * all 10 fold models load as TorchScript, hold at most 92.8k parameters and
-    buffers (and at most the matching tensor storage), and return finite
-    ``(range [B,125,1], joints [B,125,9])`` for every window;
+    buffers (and at most the matching tensor storage), keep the whole archive
+    (code, pickled attributes, extra files) under ~1 MB uncompressed, and return
+    finite ``(range [B,125,1], joints [B,125,9])`` for every window;
   * pooled median elbow/wrist error beats the best constant pose (mean_pose);
   * mean range error beats the raw UWB stream (raw_uwb).
 """
@@ -39,7 +40,7 @@ FINGERPRINT = HERE / "fingerprint.json"
 FIXED_DIR = HERE / "fixed_models"
 
 TEST_SEED = 0x6A1F_3C59_D2E8_47B1_9E04_5A7C_B3D1_28F6
-TEST_SUBJECTS = 16
+TEST_SUBJECTS = 48
 TEST_FRAMES = 3000
 WINDOW = 125
 TARGET_INDEX = 119  # 120th output frame: 5 frames (200 ms) of look-ahead
@@ -51,6 +52,10 @@ BATCH = 512
 ORDER_SEED = 20251109
 PARAM_LIMIT = 92_800  # 2x the paper's 46.4k-parameter model
 STORAGE_LIMIT_BYTES = 8 * PARAM_LIMIT
+# Whole archive, uncompressed: tensor storage plus 256 KB for code, pickled
+# attributes and extra files (the reference archive carries ~53 KB of these).
+# Without it, capacity could hide in non-tensor attributes or code literals.
+ARCHIVE_LIMIT_BYTES = STORAGE_LIMIT_BYTES + 256 * 1024
 STORAGE_RE = re.compile(r"^[^/]+/(?:data|constants)/[^/]+$")
 
 POSE_EXP = "pose_tracking_synthetic"
@@ -100,8 +105,8 @@ def _check_fingerprint(subjects: list[dict]) -> None:
 def build_test_set() -> dict[str, np.ndarray]:
     subjects = sim.make_participants(TEST_SEED, TEST_SUBJECTS, TEST_FRAMES)
     _check_fingerprint(subjects)
-    xs, joints, dist, raw, span, motion = [], [], [], [], [], []
-    for s in subjects:
+    xs, joints, dist, raw, span, motion, who = [], [], [], [], [], [], []
+    for pid, s in enumerate(subjects):
         feats = np.ascontiguousarray(s["features"], dtype=np.float32)
         frames = feats.shape[0]
         targets = np.arange(TARGET_INDEX, frames - LOOK_AHEAD, STRIDE)
@@ -114,6 +119,7 @@ def build_test_set() -> dict[str, np.ndarray]:
         raw.append(feats[targets, 0].astype(np.float64))
         span.append(np.full(targets.size, a))
         motion.append(np.linalg.norm(j[targets, 6:9] - j[targets - MOTION_LAG, 6:9], axis=1) * a)
+        who.append(np.full(targets.size, pid))
     data = {
         "X": np.concatenate(xs).astype(np.float32),
         "joints": np.concatenate(joints),
@@ -121,6 +127,7 @@ def build_test_set() -> dict[str, np.ndarray]:
         "raw": np.concatenate(raw),
         "span": np.concatenate(span),
         "motion": np.concatenate(motion),
+        "participant": np.concatenate(who),  # not scored; for paired noise analysis
     }
     data["high_motion"] = data["motion"] >= np.quantile(data["motion"], 0.75)
     raw_err = np.abs(data["raw"] - data["dist"]) * data["span"]
@@ -149,8 +156,10 @@ def pose_metrics(pred: np.ndarray, true: np.ndarray, span: np.ndarray, high_moti
 def range_metrics(pred: np.ndarray, true: np.ndarray, raw: np.ndarray, span: np.ndarray, hard: np.ndarray) -> dict[str, float]:
     corrected_err = np.abs(pred - true) * span * 100.0
     raw_err = np.abs(raw - true) * span * 100.0
+    corrected_mae = float(np.mean(corrected_err))
     return {
-        "corrected_uwb_mae_cm": float(np.mean(corrected_err)),
+        "uwb_error_reduction_pct": 100.0 * (1.0 - corrected_mae / float(np.mean(raw_err))),
+        "corrected_uwb_mae_cm": corrected_mae,
         "corrected_uwb_p90_cm": float(np.percentile(corrected_err, 90)),
         "occluded_uwb_mae_cm": float(np.mean(corrected_err[hard])),
         "uwb_correction_win_rate": float(np.mean(corrected_err < raw_err)),
@@ -165,9 +174,13 @@ def inspect_model(path: Path) -> tuple[int, int]:
         raise SubmissionError(f"missing {path}")
     try:
         with zipfile.ZipFile(path) as zf:
-            storage = sum(info.file_size for info in zf.infolist() if STORAGE_RE.match(info.filename))
+            infos = zf.infolist()
     except zipfile.BadZipFile as exc:
         raise SubmissionError(f"{path} is not a TorchScript archive") from exc
+    total = sum(info.file_size for info in infos)
+    if total > ARCHIVE_LIMIT_BYTES:
+        raise SubmissionError(f"archive holds {total} bytes uncompressed, above the {ARCHIVE_LIMIT_BYTES}-byte limit")
+    storage = sum(info.file_size for info in infos if STORAGE_RE.match(info.filename))
     module = torch.jit.load(str(path), map_location="cpu")
     seen: set[tuple[int, int]] = set()
     count = 0
@@ -346,6 +359,7 @@ def main() -> None:
             "stride": STRIDE,
             "param_limit": PARAM_LIMIT,
             "storage_limit_bytes": STORAGE_LIMIT_BYTES,
+            "archive_limit_bytes": ARCHIVE_LIMIT_BYTES,
             "device": str(device),
             "skipped": skipped,
         },
